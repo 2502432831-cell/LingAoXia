@@ -1,0 +1,2510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开心刮刮乐 - 抽奖系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 美化滚动条 */
+        .lottery-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .lottery-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .lottery-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .lottery-content::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden; /* 防止body滚动 */
+        }
+
+        /* 顶部导航栏 */
+        .header {
+            background: #fff;
+            padding: 15px 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            flex-shrink: 0; /* 防止header被压缩 */
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .header-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #1890ff;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #1890ff, #36cfc9);
+            border-radius: 50%;
+        }
+
+        .page-header-inline {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: #1890ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* 抽奖列表页面 */
+        .lottery-list-page {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 132px); /* 减去header的高度 */
+            background: #f0f2f5;
+        }
+
+        .lottery-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            min-height: 0; /* 允许flex子元素收缩 */
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #333;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-btn:hover {
+            color: #1890ff;
+        }
+
+        .page-title {
+            font-size: 16px;
+            color: #333;
+            font-weight: normal;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .toolbar select, .toolbar input {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 2px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .toolbar input {
+            width: 200px;
+        }
+
+        .search-btn, .create-btn {
+            padding: 6px 20px;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-btn {
+            background: #1890ff;
+            color: white;
+        }
+
+        .search-btn:hover {
+            background: #40a9ff;
+        }
+
+        .create-btn {
+            background: #1890ff;
+            color: white;
+        }
+
+        .create-btn:hover {
+            background: #40a9ff;
+        }
+
+        .lottery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .lottery-card {
+            background: white;
+            border-radius: 2px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .lottery-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .lottery-card-image {
+            width: 100%;
+            height: 130px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .lottery-card-type {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(255,105,180,0.9);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .lottery-card-menu {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .lottery-card-menu:hover {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .menu-dropdown {
+            position: absolute;
+            top: 36px;
+            right: 0;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+            padding: 8px 0;
+            min-width: 120px;
+            z-index: 100;
+            display: none;
+        }
+
+        .menu-dropdown.active {
+            display: block;
+        }
+
+        .menu-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            transition: background 0.3s;
+        }
+
+        .menu-item:hover {
+            background: #f5f5f5;
+        }
+
+        .menu-item.danger {
+            color: #ff4d4f;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 14px;
+        }
+
+        .lottery-card-info {
+            padding: 10px 12px;
+        }
+
+        .lottery-card-title {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .lottery-card-title:hover {
+            overflow: visible;
+            white-space: normal;
+            word-break: break-all;
+        }
+
+        .lottery-card-meta {
+            font-size: 12px;
+            color: #999;
+            line-height: 1.6;
+        }
+
+        /* 响应式布局 */
+        @media (max-width: 1200px) {
+            .lottery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 15px;
+            }
+
+            .header-bottom {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            .toolbar {
+                flex-wrap: wrap;
+            }
+
+            .lottery-content {
+                padding: 15px;
+            }
+
+            .lottery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 12px;
+            }
+
+            .lottery-card-image {
+                height: 120px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo span {
+                display: none;
+            }
+
+            .page-title {
+                font-size: 14px;
+            }
+
+            .toolbar select,
+            .toolbar input {
+                font-size: 12px;
+                padding: 5px 8px;
+            }
+
+            .lottery-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* 刮刮乐游戏页面 */
+        .scratch-game-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #ffeef8 0%, #ffe0f0 100%);
+            overflow: hidden;
+        }
+
+        .scratch-game-page.active {
+            display: block;
+        }
+
+        .game-header {
+            text-align: center;
+            padding: 30px 0 20px;
+            position: relative;
+        }
+
+        .game-title {
+            font-size: 32px;
+            color: #ff69b4;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .close-game-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.8);
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            color: #ff69b4;
+        }
+
+        .scratch-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 游戏容器 */
+        .game-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 幸运转盘样式 */
+        .wheel-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            padding: 40px 20px;
+        }
+
+        #wheelCanvas {
+            border-radius: 50%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            color: #ff4d4f;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .spin-btn {
+            padding: 15px 50px;
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ff6b6b, #ff4d4f);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255,77,79,0.4);
+            transition: all 0.3s;
+        }
+
+        .spin-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,77,79,0.6);
+        }
+
+        .spin-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* 摇一摇样式 */
+        .shake-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
+            gap: 30px;
+        }
+
+        .shake-phone {
+            font-size: 150px;
+            cursor: pointer;
+            animation: shake-idle 2s infinite ease-in-out;
+            transition: transform 0.1s;
+        }
+
+        .shake-phone:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes shake-idle {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        @keyframes shake-active {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
+        .shake-text {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .shake-result {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff69b4;
+            min-height: 50px;
+        }
+
+        /* 九宫格样式 */
+        .grid-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            padding: 40px 20px;
+        }
+
+        .grid-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .grid-item {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .grid-item.active {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255,215,0,0.8);
+        }
+
+        .grid-item-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .start-btn {
+            padding: 15px 50px;
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+            transition: all 0.3s;
+        }
+
+        .start-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.6);
+        }
+
+        .start-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* 扭蛋机样式 */
+        .capsule-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            padding: 40px 20px;
+        }
+
+        .capsule-machine {
+            width: 350px;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .capsule-top {
+            width: 100%;
+            height: 200px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .capsule-ball {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.5s;
+        }
+
+        .capsule-middle {
+            width: 100%;
+            padding: 20px;
+            background: rgba(255,255,255,0.9);
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .capsule-display {
+            text-align: center;
+        }
+
+        .capsule-text {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .capsule-bottom {
+            padding-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .capsule-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border: 5px solid white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+        .capsule-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        .capsule-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .capsule-btn-text {
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .capsule-result {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff69b4;
+            text-align: center;
+            min-height: 40px;
+        }
+
+        .scratch-card {
+            aspect-ratio: 1;
+            background: white;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(255,105,180,0.3);
+        }
+
+        .scratch-card-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            font-size: 20px;
+            color: #ff69b4;
+            font-weight: bold;
+            padding: 20px;
+            text-align: center;
+            word-break: break-all;
+        }
+
+        .scratch-card-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            touch-action: none;
+        }
+
+        .floating-icons {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .floating-icon {
+            position: absolute;
+            font-size: 30px;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* 创建活动弹窗 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .confirm-modal {
+            max-width: 400px;
+        }
+
+        .confirm-content {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .confirm-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .confirm-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .confirm-message {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-label.required::before {
+            content: '*';
+            color: #ff4d4f;
+            margin-right: 4px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .image-upload {
+            border: 2px dashed #d9d9d9;
+            border-radius: 4px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .image-upload:hover {
+            border-color: #1890ff;
+        }
+
+        .image-preview {
+            max-width: 200px;
+            margin: 10px auto;
+            border-radius: 4px;
+        }
+
+        .upload-text {
+            color: #1890ff;
+            font-size: 14px;
+        }
+
+        .prize-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .prize-tag {
+            padding: 6px 15px;
+            background: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prize-tag:hover {
+            background: #bae7ff;
+        }
+
+        .prize-tag.selected {
+            background: #1890ff;
+            color: white;
+        }
+
+        .prize-tag-text {
+            flex: 1;
+        }
+
+        .prize-tag-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .prize-tag-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 2px 4px;
+            font-size: 12px;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .prize-tag-btn:hover {
+            opacity: 1;
+        }
+
+        .prize-tag.selected .prize-tag-btn {
+            color: white;
+        }
+
+        .prize-input-wrapper {
+            padding: 6px 0;
+        }
+
+        .prize-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #1890ff;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .prize-input:focus {
+            border-color: #40a9ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+
+        .add-prize-btn {
+            padding: 6px 15px;
+            background: white;
+            color: #1890ff;
+            border: 1px dashed #1890ff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .add-prize-btn:hover {
+            background: #e6f7ff;
+            border-color: #40a9ff;
+        }
+
+        .add-prize-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 抽奖类型卡片 */
+        .lottery-type-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .type-card {
+            border: 2px solid #d9d9d9;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .type-card:hover {
+            border-color: #1890ff;
+            box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+        }
+
+        .type-card.selected {
+            border-color: #1890ff;
+            background: #e6f7ff;
+        }
+
+        .type-card-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .type-card-name {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .type-card.selected .type-card-name {
+            color: #1890ff;
+        }
+
+        .type-card-badge {
+            display: inline-block;
+            background: #52c41a;
+            color: white;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-cancel {
+            background: white;
+            border: 1px solid #d9d9d9;
+            color: #333;
+        }
+
+        .btn-primary {
+            background: #1890ff;
+            color: white;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: white;
+            border-top: 1px solid #f0f0f0;
+            flex-shrink: 0; /* 防止分页器被压缩 */
+        }
+
+        .pagination select, .pagination input {
+            padding: 5px 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+        }
+
+        .pagination button {
+            padding: 5px 15px;
+            border: 1px solid #d9d9d9;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="header">
+        <div class="header-top">
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <span>兆涵科技</span>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">👤</div>
+            </div>
+        </div>
+        <div class="header-bottom">
+            <div class="page-header-inline">
+                <button class="back-btn" onclick="history.back()">←</button>
+                <h1 class="page-title">趣味抽奖</h1>
+            </div>
+            <div class="toolbar">
+                <select id="filterPeriod">
+                    <option>近一周</option>
+                    <option>近一月</option>
+                    <option>近三月</option>
+                </select>
+                <select id="filterStatus">
+                    <option>全部抽奖</option>
+                    <option>开心刮刮乐</option>
+                    <option>幸运转盘</option>
+                </select>
+                <input type="text" id="searchInput" placeholder="请输入关键字搜索">
+                <button class="search-btn" onclick="searchLottery()">搜索</button>
+                <button class="create-btn" onclick="openCreateModal()">创建抽奖活动</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 抽奖活动列表页面 -->
+    <div class="lottery-list-page" id="listPage">
+        <div class="lottery-content">
+            <div class="lottery-grid" id="lotteryGrid">
+                <!-- 抽奖卡片将动态生成 -->
+            </div>
+        </div>
+
+        <div class="pagination">
+            <select id="pageSize">
+                <option value="20">20条/页</option>
+                <option value="50">50条/页</option>
+                <option value="100">100条/页</option>
+            </select>
+            <button onclick="prevPage()" id="prevBtn">上一页</button>
+            <span>第 <input type="number" id="currentPage" value="1" style="width: 50px;"> 页</span>
+            <button onclick="nextPage()" id="nextBtn">下一页</button>
+            <span id="totalPages">共 2 页</span>
+        </div>
+    </div>
+
+    <!-- 游戏页面 -->
+    <div class="scratch-game-page" id="gamePage">
+        <div class="floating-icons" id="floatingIcons"></div>
+        
+        <div class="game-header">
+            <h1 class="game-title" id="gameTitle">抽奖游戏</h1>
+            <button class="close-game-btn" onclick="closeGame()">✕</button>
+        </div>
+
+        <!-- 刮刮乐游戏 -->
+        <div class="game-container" id="scratchGameContainer">
+            <div class="scratch-grid" id="scratchGrid">
+                <!-- 刮刮卡将动态生成 -->
+            </div>
+        </div>
+
+        <!-- 幸运转盘游戏 -->
+        <div class="game-container" id="wheelGameContainer" style="display: none;">
+            <div class="wheel-container">
+                <canvas id="wheelCanvas" width="400" height="400"></canvas>
+                <button class="spin-btn" id="spinBtn" onclick="spinWheel()">开始抽奖</button>
+                <div class="wheel-pointer">▼</div>
+            </div>
+        </div>
+
+        <!-- 摇一摇游戏 -->
+        <div class="game-container" id="shakeGameContainer" style="display: none;">
+            <div class="shake-container">
+                <div class="shake-phone" id="shakePhone">
+                    📱
+                </div>
+                <div class="shake-text">摇动手机或点击图标开始抽奖</div>
+                <div class="shake-result" id="shakeResult"></div>
+            </div>
+        </div>
+
+        <!-- 九宫格游戏 -->
+        <div class="game-container" id="gridGameContainer" style="display: none;">
+            <div class="grid-container">
+                <div class="grid-board" id="gridBoard">
+                    <!-- 九宫格将动态生成 -->
+                </div>
+                <button class="start-btn" id="gridStartBtn" onclick="startGrid()">开始抽奖</button>
+            </div>
+        </div>
+
+        <!-- 扭蛋机游戏 -->
+        <div class="game-container" id="capsuleGameContainer" style="display: none;">
+            <div class="capsule-container">
+                <div class="capsule-machine">
+                    <div class="capsule-top">
+                        <div class="capsule-ball" id="capsuleBall"></div>
+                    </div>
+                    <div class="capsule-middle">
+                        <div class="capsule-display" id="capsuleDisplay">
+                            <div class="capsule-text">点击按钮抽取扭蛋</div>
+                        </div>
+                    </div>
+                    <div class="capsule-bottom">
+                        <button class="capsule-btn" id="capsuleBtn" onclick="drawCapsule()">
+                            <span class="capsule-btn-text">抽取扭蛋</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="capsule-result" id="capsuleResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 创建/编辑活动弹窗 -->
+    <div class="modal-overlay" id="createModal">
+        <div class="modal">
+            <div class="modal-header" id="modalTitle">创建抽奖活动</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label required">抽奖标题：</label>
+                    <input type="text" class="form-input" id="lotteryTitle" placeholder="请输入抽奖活动标题">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required">抽奖类型：</label>
+                    <div class="lottery-type-cards" id="lotteryTypeCards">
+                        <div class="type-card selected" data-type="开心刮刮乐" onclick="selectLotteryType(this)">
+                            <div class="type-card-icon">🎨</div>
+                            <div class="type-card-name">开心刮刮乐</div>
+                            <div class="type-card-badge">推荐</div>
+                        </div>
+                        <div class="type-card" data-type="幸运转盘" onclick="selectLotteryType(this)">
+                            <div class="type-card-icon">🎡</div>
+                            <div class="type-card-name">幸运转盘</div>
+                        </div>
+                        <div class="type-card" data-type="摇一摇" onclick="selectLotteryType(this)">
+                            <div class="type-card-icon">📱</div>
+                            <div class="type-card-name">摇一摇</div>
+                        </div>
+                        <div class="type-card" data-type="九宫格" onclick="selectLotteryType(this)">
+                            <div class="type-card-icon">🎯</div>
+                            <div class="type-card-name">九宫格</div>
+                        </div>
+                        <div class="type-card" data-type="扭蛋机" onclick="selectLotteryType(this)">
+                            <div class="type-card-icon">🎰</div>
+                            <div class="type-card-name">扭蛋机</div>
+                            <div class="type-card-badge" style="background: #ff9800;">新品</div>
+                        </div>
+                    </div>
+                    <div id="typeEditHint" style="display: none; color: #ff9800; font-size: 12px; margin-top: 8px;">
+                        ⓘ 编辑模式下不允许更换抽奖类型
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required">奖品信息：</label>
+                    <div class="prize-tags" id="prizeTags">
+                        <!-- 奖品标签将动态生成 -->
+                    </div>
+                    <button class="add-prize-btn" onclick="startAddNewPrize()" style="margin-top: 10px; width: 100%;">+ 添加奖品</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeCreateModal()">取消</button>
+                <button class="btn btn-primary" id="submitBtn" onclick="createLottery()">生成抽奖活动</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除确认弹窗 -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal confirm-modal">
+            <div class="confirm-content">
+                <div class="confirm-icon">⚠️</div>
+                <div class="confirm-title">确认删除</div>
+                <div class="confirm-message" id="deleteMessage">确定要删除这个抽奖活动吗？删除后将无法恢复。</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeDeleteModal()">取消</button>
+                <button class="btn btn-primary" style="background: #ff4d4f;" onclick="confirmDelete()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除奖品确认弹窗 -->
+    <div class="modal-overlay" id="deletePrizeModal">
+        <div class="modal confirm-modal">
+            <div class="confirm-content">
+                <div class="confirm-icon">⚠️</div>
+                <div class="confirm-title">确认删除</div>
+                <div class="confirm-message" id="deletePrizeMessage">确定要删除这个奖品吗？</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeDeletePrizeModal()">取消</button>
+                <button class="btn btn-primary" style="background: #ff4d4f;" onclick="confirmDeletePrize()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 数据存储
+        const gradients = [
+            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+            'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+            'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+            'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+            'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+            'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+            'linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%)'
+        ];
+
+        let lotteries = [
+            {
+                id: 1,
+                title: '自主学习之星摇奖活动',
+                gradient: gradients[0],
+                type: '开心刮刮乐',
+                createTime: '2026-01-08',
+                prizes: ['奖励书一本', '奖励铅笔一支', '奖励礼品一份']
+            },
+            {
+                id: 2,
+                title: '月度优秀员工抽奖',
+                gradient: gradients[1],
+                type: '开心刮刮乐',
+                createTime: '2026-01-07',
+                prizes: ['现金红包', '购物卡', '电影票']
+            },
+            {
+                id: 3,
+                title: '新年幸运大抽奖',
+                gradient: gradients[2],
+                type: '开心刮刮乐',
+                createTime: '2026-01-06',
+                prizes: ['手机', '平板电脑', '蓝牙耳机']
+            },
+            {
+                id: 4,
+                title: '团队建设活动抽奖',
+                gradient: gradients[3],
+                type: '开心刮刮乐',
+                createTime: '2026-01-05',
+                prizes: ['旅游券', '健身卡', '美食券']
+            },
+            {
+                id: 5,
+                title: '客户答谢抽奖活动',
+                gradient: gradients[4],
+                type: '开心刮刮乐',
+                createTime: '2026-01-04',
+                prizes: ['礼品套装', '优惠券', '积分奖励']
+            },
+            {
+                id: 6,
+                title: '季度销售冠军抽奖',
+                gradient: gradients[5],
+                type: '开心刮刮乐',
+                createTime: '2026-01-03',
+                prizes: ['奖金', '奖杯', '荣誉证书']
+            },
+            {
+                id: 7,
+                title: '周年庆典抽奖活动',
+                gradient: gradients[6],
+                type: '开心刮刮乐',
+                createTime: '2026-01-02',
+                prizes: ['笔记本电脑', '智能手表', '无线耳机']
+            },
+            {
+                id: 8,
+                title: '员工生日会抽奖',
+                gradient: gradients[7],
+                type: '开心刮刮乐',
+                createTime: '2026-01-01',
+                prizes: ['生日蛋糕券', '鲜花', '礼品卡']
+            },
+            {
+                id: 9,
+                title: '项目完成庆祝抽奖',
+                gradient: gradients[8],
+                type: '开心刮刮乐',
+                createTime: '2025-12-30',
+                prizes: ['团队聚餐', '休假券', '奖金']
+            },
+            {
+                id: 10,
+                title: '年终感恩回馈抽奖',
+                gradient: gradients[9],
+                type: '开心刮刮乐',
+                createTime: '2025-12-29',
+                prizes: ['年终奖', '购物卡', '旅游基金']
+            }
+        ];
+
+        let currentLottery = null;
+        let activeMenuId = null;
+        let editingLotteryId = null;
+        let deletingLotteryId = null;
+        let deletingPrizeIndex = -1; // 正在删除的奖品索引
+        let allLotteries = []; // 保存所有数据用于搜索
+        let selectedLotteryType = '开心刮刮乐'; // 当前选中的抽奖类型
+        let prizeList = []; // 奖品列表
+        let editingPrizeIndex = -1; // 正在编辑的奖品索引
+        let isAddingPrize = false; // 是否正在添加奖品
+
+        // 初始化页面
+        function init() {
+            allLotteries = [...lotteries]; // 保存原始数据
+            renderLotteryList();
+            generateFloatingIcons();
+        }
+
+        // 渲染抽奖列表
+        function renderLotteryList() {
+            const grid = document.getElementById('lotteryGrid');
+            grid.innerHTML = '';
+
+            if (lotteries.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">📋</div>
+                        <div class="empty-state-text">暂无抽奖活动</div>
+                    </div>
+                `;
+                return;
+            }
+
+            lotteries.forEach(lottery => {
+                const card = document.createElement('div');
+                card.className = 'lottery-card';
+                
+                card.innerHTML = `
+                    <div class="lottery-card-image" style="background: ${lottery.gradient};" onclick="openGame(${lottery.id})">
+                        <div class="lottery-card-type">${lottery.type}</div>
+                        <div class="lottery-card-menu" onclick="event.stopPropagation(); toggleMenu(${lottery.id}, event)">⋯</div>
+                        <div class="menu-dropdown" id="menu-${lottery.id}">
+                            <div class="menu-item" onclick="event.stopPropagation(); editLottery(${lottery.id})">编辑</div>
+                            <div class="menu-item danger" onclick="event.stopPropagation(); deleteLottery(${lottery.id})">删除</div>
+                        </div>
+                    </div>
+                    <div class="lottery-card-info" onclick="openGame(${lottery.id})">
+                        <div class="lottery-card-title" title="${lottery.title}">${lottery.title}</div>
+                        <div class="lottery-card-meta">
+                            类型：${lottery.type}<br>
+                            创建：${lottery.createTime}<br>
+                            奖品：${lottery.prizes.length}个
+                        </div>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // 切换菜单显示
+        function toggleMenu(id, event) {
+            event.stopPropagation();
+            
+            // 关闭其他菜单
+            document.querySelectorAll('.menu-dropdown').forEach(menu => {
+                if (menu.id !== `menu-${id}`) {
+                    menu.classList.remove('active');
+                }
+            });
+            
+            // 切换当前菜单
+            const menu = document.getElementById(`menu-${id}`);
+            menu.classList.toggle('active');
+            activeMenuId = menu.classList.contains('active') ? id : null;
+        }
+
+        // 编辑抽奖
+        function editLottery(id) {
+            const lottery = allLotteries.find(l => l.id === id);
+            if (lottery) {
+                editingLotteryId = id;
+                selectedLotteryType = lottery.type;
+                prizeList = [...lottery.prizes]; // 复制奖品列表
+                
+                // 填充表单
+                document.getElementById('lotteryTitle').value = lottery.title;
+                document.getElementById('modalTitle').textContent = '编辑抽奖活动';
+                document.getElementById('submitBtn').textContent = '保存修改';
+                
+                // 显示提示信息
+                document.getElementById('typeEditHint').style.display = 'block';
+                
+                // 禁用类型选择（编辑时不允许更换类型）
+                document.querySelectorAll('.type-card').forEach(card => {
+                    card.classList.remove('selected');
+                    card.style.pointerEvents = 'none';
+                    card.style.opacity = '0.6';
+                    if (card.getAttribute('data-type') === lottery.type) {
+                        card.classList.add('selected');
+                    }
+                });
+                
+                // 渲染奖品列表
+                renderPrizeList();
+                
+                // 显示弹窗
+                document.getElementById('createModal').classList.add('active');
+                closeAllMenus();
+            }
+        }
+
+
+        // 删除抽奖
+        function deleteLottery(id) {
+            const lottery = allLotteries.find(l => l.id === id);
+            if (lottery) {
+                deletingLotteryId = id;
+                document.getElementById('deleteMessage').textContent = 
+                    `确定要删除"${lottery.title}"吗？删除后将无法恢复。`;
+                document.getElementById('deleteModal').classList.add('active');
+                closeAllMenus();
+            }
+        }
+
+        // 确认删除
+        function confirmDelete() {
+            if (deletingLotteryId) {
+                allLotteries = allLotteries.filter(l => l.id !== deletingLotteryId);
+                lotteries = lotteries.filter(l => l.id !== deletingLotteryId);
+                deletingLotteryId = null;
+                renderLotteryList();
+                closeDeleteModal();
+            }
+        }
+
+        // 关闭删除弹窗
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            deletingLotteryId = null;
+        }
+
+        // 关闭所有菜单
+        function closeAllMenus() {
+            document.querySelectorAll('.menu-dropdown').forEach(menu => {
+                menu.classList.remove('active');
+            });
+            activeMenuId = null;
+        }
+
+        // 点击页面其他地方关闭菜单
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.lottery-card-menu')) {
+                closeAllMenus();
+            }
+        });
+
+        // 打开游戏
+        function openGame(id) {
+            const lottery = lotteries.find(l => l.id === id);
+            if (lottery) {
+                currentLottery = lottery;
+                document.getElementById('listPage').style.display = 'none';
+                document.getElementById('gamePage').classList.add('active');
+                
+                // 根据类型显示不同的游戏
+                showGameByType(lottery.type);
+            }
+        }
+
+        // 根据类型显示游戏
+        function showGameByType(type) {
+            // 隐藏所有游戏容器
+            document.querySelectorAll('.game-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            
+            // 更新标题
+            const titles = {
+                '开心刮刮乐': '开心刮刮乐',
+                '幸运转盘': '幸运转盘',
+                '摇一摇': '摇一摇抽奖',
+                '九宫格': '九宫格抽奖',
+                '扭蛋机': '扭蛋机'
+            };
+            document.getElementById('gameTitle').textContent = titles[type] || '抽奖游戏';
+            
+            // 显示对应的游戏
+            switch(type) {
+                case '开心刮刮乐':
+                    document.getElementById('scratchGameContainer').style.display = 'block';
+                    generateScratchCards();
+                    break;
+                case '幸运转盘':
+                    document.getElementById('wheelGameContainer').style.display = 'block';
+                    generateWheel();
+                    break;
+                case '摇一摇':
+                    document.getElementById('shakeGameContainer').style.display = 'block';
+                    initShakeGame();
+                    break;
+                case '九宫格':
+                    document.getElementById('gridGameContainer').style.display = 'block';
+                    generateGrid();
+                    break;
+                case '扭蛋机':
+                    document.getElementById('capsuleGameContainer').style.display = 'block';
+                    initCapsuleGame();
+                    break;
+            }
+        }
+
+        // ========== 幸运转盘 ==========
+        let wheelSpinning = false;
+        let wheelRotation = 0;
+
+        function generateWheel() {
+            const canvas = document.getElementById('wheelCanvas');
+            const ctx = canvas.getContext('2d');
+            const prizes = currentLottery.prizes;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 180;
+            const anglePerPrize = (Math.PI * 2) / prizes.length;
+
+            // 清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制转盘
+            prizes.forEach((prize, index) => {
+                const startAngle = index * anglePerPrize;
+                const endAngle = startAngle + anglePerPrize;
+                
+                // 绘制扇形
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                
+                // 填充颜色
+                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7', '#fd79a8'];
+                ctx.fillStyle = colors[index % colors.length];
+                ctx.fill();
+                
+                // 绘制边框
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                
+                // 绘制文字
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(startAngle + anglePerPrize / 2);
+                ctx.textAlign = 'center';
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText(prize, radius / 2, 5);
+                ctx.restore();
+            });
+
+            // 绘制中心圆
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        function spinWheel() {
+            if (wheelSpinning) return;
+            
+            wheelSpinning = true;
+            const btn = document.getElementById('spinBtn');
+            btn.disabled = true;
+            
+            const canvas = document.getElementById('wheelCanvas');
+            const prizes = currentLottery.prizes;
+            const anglePerPrize = 360 / prizes.length;
+            
+            // 随机选择奖品
+            const winIndex = Math.floor(Math.random() * prizes.length);
+            const targetAngle = 360 * 5 + (360 - winIndex * anglePerPrize - anglePerPrize / 2);
+            
+            let currentRotation = 0;
+            const duration = 3000;
+            const startTime = Date.now();
+            
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // 缓动函数
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                currentRotation = targetAngle * easeOut;
+                
+                canvas.style.transform = `rotate(${currentRotation}deg)`;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    wheelSpinning = false;
+                    btn.disabled = false;
+                    setTimeout(() => {
+                        alert(`恭喜获得：${prizes[winIndex]}`);
+                    }, 500);
+                }
+            }
+            
+            animate();
+        }
+
+        // ========== 摇一摇 ==========
+        let shaking = false;
+        let shakeCount = 0;
+        let lastX = 0, lastY = 0, lastZ = 0;
+
+        function initShakeGame() {
+            const phone = document.getElementById('shakePhone');
+            const result = document.getElementById('shakeResult');
+            result.textContent = '';
+            shaking = false;
+            shakeCount = 0;
+            
+            // 点击触发
+            phone.onclick = function() {
+                if (!shaking) {
+                    startShake();
+                }
+            };
+            
+            // 监听设备运动（移动端）
+            if (window.DeviceMotionEvent) {
+                window.addEventListener('devicemotion', handleMotion);
+            }
+        }
+
+        function handleMotion(event) {
+            if (shaking) return;
+            
+            const acceleration = event.accelerationIncludingGravity;
+            const x = acceleration.x;
+            const y = acceleration.y;
+            const z = acceleration.z;
+            
+            const deltaX = Math.abs(x - lastX);
+            const deltaY = Math.abs(y - lastY);
+            const deltaZ = Math.abs(z - lastZ);
+            
+            if (deltaX + deltaY + deltaZ > 30) {
+                startShake();
+            }
+            
+            lastX = x;
+            lastY = y;
+            lastZ = z;
+        }
+
+        function startShake() {
+            shaking = true;
+            const phone = document.getElementById('shakePhone');
+            const result = document.getElementById('shakeResult');
+            
+            // 摇动动画
+            phone.style.animation = 'shake-active 0.5s';
+            
+            setTimeout(() => {
+                phone.style.animation = 'shake-idle 2s infinite ease-in-out';
+                
+                // 随机选择奖品
+                const prizes = currentLottery.prizes;
+                const winPrize = prizes[Math.floor(Math.random() * prizes.length)];
+                
+                result.textContent = `🎉 ${winPrize}`;
+                shaking = false;
+            }, 500);
+        }
+
+        // ========== 九宫格 ==========
+        let gridRunning = false;
+        let gridCurrentIndex = 0;
+        let gridTimer = null;
+
+        function generateGrid() {
+            const board = document.getElementById('gridBoard');
+            board.innerHTML = '';
+            
+            const prizes = currentLottery.prizes;
+            const icons = ['🎁', '🏆', '⭐', '💎', '🎯', '🎪', '🎨', '🎭', '🎸'];
+            
+            // 生成9个格子
+            for (let i = 0; i < 9; i++) {
+                const item = document.createElement('div');
+                item.className = 'grid-item';
+                item.id = `grid-item-${i}`;
+                
+                const prize = i < prizes.length ? prizes[i] : '谢谢参与';
+                
+                item.innerHTML = `
+                    <div class="grid-item-icon">${icons[i]}</div>
+                    <div>${prize}</div>
+                `;
+                
+                board.appendChild(item);
+            }
+        }
+
+        function startGrid() {
+            if (gridRunning) return;
+            
+            gridRunning = true;
+            const btn = document.getElementById('gridStartBtn');
+            btn.disabled = true;
+            
+            let speed = 100;
+            let count = 0;
+            const maxCount = 30;
+            
+            // 随机选择最终位置
+            const finalIndex = Math.floor(Math.random() * 9);
+            
+            gridTimer = setInterval(() => {
+                // 移除上一个高亮
+                document.querySelectorAll('.grid-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // 高亮当前格子
+                const currentItem = document.getElementById(`grid-item-${gridCurrentIndex}`);
+                currentItem.classList.add('active');
+                
+                // 移动到下一个格子
+                gridCurrentIndex = (gridCurrentIndex + 1) % 9;
+                count++;
+                
+                // 逐渐减速
+                if (count > maxCount - 10) {
+                    speed += 20;
+                }
+                
+                // 停止条件
+                if (count >= maxCount && gridCurrentIndex === finalIndex) {
+                    clearInterval(gridTimer);
+                    gridRunning = false;
+                    btn.disabled = false;
+                    
+                    const winItem = document.getElementById(`grid-item-${finalIndex}`);
+                    const winText = winItem.textContent.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '').trim();
+                    
+                    setTimeout(() => {
+                        alert(`恭喜获得：${winText}`);
+                    }, 500);
+                }
+            }, speed);
+        }
+
+        // ========== 扭蛋机 ==========
+        let capsuleDrawing = false;
+
+        function initCapsuleGame() {
+            const display = document.getElementById('capsuleDisplay');
+            const result = document.getElementById('capsuleResult');
+            display.innerHTML = '<div class="capsule-text">点击按钮抽取扭蛋</div>';
+            result.textContent = '';
+        }
+
+        function drawCapsule() {
+            if (capsuleDrawing) return;
+            
+            capsuleDrawing = true;
+            const btn = document.getElementById('capsuleBtn');
+            const ball = document.getElementById('capsuleBall');
+            const display = document.getElementById('capsuleDisplay');
+            const result = document.getElementById('capsuleResult');
+            
+            btn.disabled = true;
+            
+            // 扭蛋掉落动画
+            ball.style.transform = 'translateY(200px)';
+            ball.style.transition = 'transform 0.8s cubic-bezier(0.5, 0, 0.5, 1)';
+            
+            setTimeout(() => {
+                // 随机选择奖品
+                const prizes = currentLottery.prizes;
+                const winPrize = prizes[Math.floor(Math.random() * prizes.length)];
+                
+                // 显示结果
+                display.innerHTML = `
+                    <div style="font-size: 48px; margin-bottom: 10px;">🎁</div>
+                    <div style="font-size: 20px; font-weight: bold; color: #ff69b4;">${winPrize}</div>
+                `;
+                
+                result.textContent = `🎉 恭喜获得：${winPrize}`;
+                
+                // 重置扭蛋位置
+                setTimeout(() => {
+                    ball.style.transition = 'transform 0.3s';
+                    ball.style.transform = 'translateY(0)';
+                    capsuleDrawing = false;
+                    btn.disabled = false;
+                }, 1000);
+            }, 800);
+        }
+
+        // 关闭游戏
+        function closeGame() {
+            document.getElementById('gamePage').classList.remove('active');
+            document.getElementById('listPage').style.display = 'flex';
+        }
+
+        // 生成刮刮卡
+        function generateScratchCards() {
+            const grid = document.getElementById('scratchGrid');
+            grid.innerHTML = '';
+
+            const prizes = currentLottery.prizes;
+            const cards = 9;
+            
+            // 随机分配奖品
+            const cardPrizes = [];
+            for (let i = 0; i < cards; i++) {
+                if (i < prizes.length) {
+                    cardPrizes.push(prizes[i]);
+                } else {
+                    cardPrizes.push('谢谢参与');
+                }
+            }
+            
+            // 打乱顺序
+            cardPrizes.sort(() => Math.random() - 0.5);
+
+            for (let i = 0; i < cards; i++) {
+                const card = document.createElement('div');
+                card.className = 'scratch-card';
+                card.id = `scratch-card-${i}`;
+                
+                card.innerHTML = `
+                    <div class="scratch-card-content">${cardPrizes[i]}</div>
+                    <canvas class="scratch-card-canvas" id="canvas-${i}"></canvas>
+                `;
+                
+                grid.appendChild(card);
+                
+                // 初始化刮刮卡
+                initScratchCard(i);
+            }
+        }
+
+        // 初始化刮刮卡
+        function initScratchCard(index) {
+            const canvas = document.getElementById(`canvas-${index}`);
+            const card = document.getElementById(`scratch-card-${index}`);
+            const ctx = canvas.getContext('2d');
+            
+            // 设置canvas尺寸
+            const rect = card.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            
+            // 绘制刮刮乐涂层
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#ff69b4');
+            gradient.addColorStop(1, '#ff1493');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 添加图标
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.font = '40px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const icons = ['🔍', '🎁', '🏆', '⭐', '🎨', '🎪'];
+            const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+            ctx.fillText(randomIcon, canvas.width / 2, canvas.height / 2);
+            
+            // 设置擦除模式
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+            
+            // 获取坐标
+            function getCoordinates(e) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                
+                if (e.touches && e.touches.length > 0) {
+                    return {
+                        x: (e.touches[0].clientX - rect.left) * scaleX,
+                        y: (e.touches[0].clientY - rect.top) * scaleY
+                    };
+                } else {
+                    return {
+                        x: (e.clientX - rect.left) * scaleX,
+                        y: (e.clientY - rect.top) * scaleY
+                    };
+                }
+            }
+            
+            // 擦除函数
+            function scratch(x, y) {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.arc(x, y, 20, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 检查擦除进度
+                checkScratchProgress(canvas, ctx);
+            }
+            
+            // 开始擦除
+            function startScratch(e) {
+                e.preventDefault();
+                isDrawing = true;
+                const coords = getCoordinates(e);
+                lastX = coords.x;
+                lastY = coords.y;
+                scratch(coords.x, coords.y);
+            }
+            
+            // 擦除中
+            function moveScratch(e) {
+                if (!isDrawing) return;
+                e.preventDefault();
+                
+                const coords = getCoordinates(e);
+                const currentX = coords.x;
+                const currentY = coords.y;
+                
+                // 绘制连续的擦除路径
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.lineWidth = 40;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(currentX, currentY);
+                ctx.stroke();
+                
+                lastX = currentX;
+                lastY = currentY;
+                
+                // 检查擦除进度
+                checkScratchProgress(canvas, ctx);
+            }
+            
+            // 结束擦除
+            function endScratch() {
+                isDrawing = false;
+            }
+            
+            // 鼠标事件
+            canvas.addEventListener('mousedown', startScratch);
+            canvas.addEventListener('mousemove', moveScratch);
+            canvas.addEventListener('mouseup', endScratch);
+            canvas.addEventListener('mouseleave', endScratch);
+            
+            // 触摸事件
+            canvas.addEventListener('touchstart', startScratch);
+            canvas.addEventListener('touchmove', moveScratch);
+            canvas.addEventListener('touchend', endScratch);
+            canvas.addEventListener('touchcancel', endScratch);
+        }
+
+        // 检查擦除进度
+        function checkScratchProgress(canvas, ctx) {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
+            let transparentPixels = 0;
+            
+            // 计算透明像素数量
+            for (let i = 3; i < pixels.length; i += 4) {
+                if (pixels[i] < 128) {
+                    transparentPixels++;
+                }
+            }
+            
+            const totalPixels = canvas.width * canvas.height;
+            const scratchedPercentage = (transparentPixels / totalPixels) * 100;
+            
+            // 如果擦除超过50%，自动显示全部
+            if (scratchedPercentage > 50) {
+                canvas.style.opacity = '0';
+                canvas.style.transition = 'opacity 0.3s';
+                setTimeout(() => {
+                    canvas.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // 生成漂浮图标
+        function generateFloatingIcons() {
+            const container = document.getElementById('floatingIcons');
+            const icons = ['🍰', '🎂', '🍭', '🍬', '🎈', '🎀', '💝', '🌟', '✨', '🎪', '🎨', '🎁'];
+            
+            for (let i = 0; i < 20; i++) {
+                const icon = document.createElement('div');
+                icon.className = 'floating-icon';
+                icon.textContent = icons[Math.floor(Math.random() * icons.length)];
+                icon.style.left = Math.random() * 100 + '%';
+                icon.style.top = Math.random() * 100 + '%';
+                icon.style.animationDelay = Math.random() * 3 + 's';
+                icon.style.animationDuration = (3 + Math.random() * 2) + 's';
+                container.appendChild(icon);
+            }
+        }
+
+        // 选择抽奖类型
+        function selectLotteryType(card) {
+            // 移除所有选中状态
+            document.querySelectorAll('.type-card').forEach(c => {
+                c.classList.remove('selected');
+            });
+            
+            // 添加选中状态
+            card.classList.add('selected');
+            selectedLotteryType = card.getAttribute('data-type');
+        }
+
+        // 渲染奖品列表
+        function renderPrizeList() {
+            console.log('渲染奖品列表, editingPrizeIndex:', editingPrizeIndex, 'isAddingPrize:', isAddingPrize);
+            const container = document.getElementById('prizeTags');
+            container.innerHTML = '';
+            
+            if (prizeList.length === 0 && !isAddingPrize) {
+                container.innerHTML = '<div style="color: #999; font-size: 14px; padding: 10px 0;">暂无奖品，请点击下方按钮添加</div>';
+                return;
+            }
+            
+            prizeList.forEach((prize, index) => {
+                console.log(`处理奖品 ${index}:`, prize, '是否编辑中:', editingPrizeIndex === index);
+                if (editingPrizeIndex === index) {
+                    // 编辑模式：显示输入框
+                    const inputWrapper = document.createElement('div');
+                    inputWrapper.className = 'prize-input-wrapper';
+                    inputWrapper.innerHTML = `
+                        <input 
+                            type="text" 
+                            class="prize-input" 
+                            id="prizeInput-${index}"
+                            value="${prize}" 
+                            placeholder="请输入奖品名称"
+                            onkeypress="if(event.key==='Enter') confirmEditPrize(${index})"
+                        />
+                    `;
+                    container.appendChild(inputWrapper);
+                    
+                    // 自动聚焦并选中文本
+                    setTimeout(() => {
+                        const input = document.getElementById(`prizeInput-${index}`);
+                        console.log('尝试聚焦输入框:', input);
+                        if (input) {
+                            input.focus();
+                            input.select();
+                        }
+                    }, 0);
+                } else {
+                    // 显示模式：显示标签
+                    const tag = document.createElement('div');
+                    tag.className = 'prize-tag';
+                    tag.innerHTML = `
+                        <span class="prize-tag-text">${prize}</span>
+                        <div class="prize-tag-actions">
+                            <button class="prize-tag-btn" onclick="startEditPrize(${index})" title="编辑">✏️</button>
+                            <button class="prize-tag-btn" onclick="showDeletePrizeConfirm(${index})" title="删除">🗑️</button>
+                        </div>
+                    `;
+                    container.appendChild(tag);
+                }
+            });
+            
+            // 添加新奖品的输入框
+            if (isAddingPrize) {
+                const inputWrapper = document.createElement('div');
+                inputWrapper.className = 'prize-input-wrapper';
+                inputWrapper.innerHTML = `
+                    <input 
+                        type="text" 
+                        class="prize-input" 
+                        id="newPrizeInput"
+                        placeholder="请输入奖品名称" 
+                        onkeypress="if(event.key==='Enter') confirmAddPrize()"
+                    />
+                `;
+                container.appendChild(inputWrapper);
+                
+                // 自动聚焦
+                setTimeout(() => {
+                    const input = document.getElementById('newPrizeInput');
+                    if (input) {
+                        input.focus();
+                    }
+                }, 0);
+            }
+        }
+
+        // 开始添加新奖品
+        function startAddNewPrize() {
+            if (isAddingPrize || editingPrizeIndex !== -1) {
+                return; // 如果正在编辑或添加，不允许再次添加
+            }
+            isAddingPrize = true;
+            renderPrizeList();
+        }
+
+        // 确认添加新奖品
+        function confirmAddPrize() {
+            const input = document.getElementById('newPrizeInput');
+            if (input) {
+                const prizeName = input.value.trim();
+                if (prizeName) {
+                    prizeList.push(prizeName);
+                }
+                isAddingPrize = false;
+                renderPrizeList();
+            }
+        }
+
+        // 取消添加新奖品
+        function cancelAddPrize() {
+            isAddingPrize = false;
+            renderPrizeList();
+        }
+
+        // 开始编辑奖品
+        function startEditPrize(index) {
+            console.log('开始编辑奖品:', index, '当前状态:', {isAddingPrize, editingPrizeIndex});
+            if (isAddingPrize || editingPrizeIndex !== -1) {
+                console.log('已有正在进行的操作，取消编辑');
+                return; // 如果正在编辑或添加，不允许再次编辑
+            }
+            editingPrizeIndex = index;
+            console.log('设置editingPrizeIndex为:', editingPrizeIndex);
+            renderPrizeList();
+        }
+
+        // 确认编辑奖品
+        function confirmEditPrize(index) {
+            console.log('确认编辑奖品:', index);
+            const input = document.getElementById(`prizeInput-${index}`);
+            console.log('找到输入框:', input);
+            if (input) {
+                const newName = input.value.trim();
+                console.log('新名称:', newName, '原名称:', prizeList[index]);
+                if (newName) {
+                    prizeList[index] = newName;
+                }
+                editingPrizeIndex = -1;
+                renderPrizeList();
+            }
+        }
+
+        // 取消编辑奖品
+        function cancelEditPrize() {
+            editingPrizeIndex = -1;
+            renderPrizeList();
+        }
+
+        // 显示删除奖品确认弹窗
+        function showDeletePrizeConfirm(index) {
+            deletingPrizeIndex = index;
+            document.getElementById('deletePrizeMessage').textContent = 
+                `确定要删除"${prizeList[index]}"吗？`;
+            document.getElementById('deletePrizeModal').classList.add('active');
+        }
+
+        // 确认删除奖品
+        function confirmDeletePrize() {
+            if (deletingPrizeIndex !== -1 && deletingPrizeIndex < prizeList.length) {
+                prizeList.splice(deletingPrizeIndex, 1);
+                deletingPrizeIndex = -1;
+                renderPrizeList();
+                closeDeletePrizeModal();
+            }
+        }
+
+        // 关闭删除奖品弹窗
+        function closeDeletePrizeModal() {
+            document.getElementById('deletePrizeModal').classList.remove('active');
+            deletingPrizeIndex = -1;
+        }
+
+        // 点击其他位置时确认编辑或添加
+        document.addEventListener('click', function(e) {
+            // 如果点击的不是输入框、其父元素、奖品标签按钮或添加按钮
+            if (!e.target.closest('.prize-input-wrapper') && 
+                !e.target.closest('.add-prize-btn') &&
+                !e.target.closest('.prize-tag-btn')) {
+                
+                if (isAddingPrize) {
+                    confirmAddPrize();
+                } else if (editingPrizeIndex !== -1) {
+                    confirmEditPrize(editingPrizeIndex);
+                }
+            }
+        });
+
+        // 打开创建弹窗
+        function openCreateModal() {
+            // 重置为创建模式
+            editingLotteryId = null;
+            selectedLotteryType = '开心刮刮乐';
+            prizeList = ['奖励书一本', '奖励铅笔一支', '奖励礼品一份'];
+            
+            document.getElementById('lotteryTitle').value = '';
+            document.getElementById('modalTitle').textContent = '创建抽奖活动';
+            document.getElementById('submitBtn').textContent = '生成抽奖活动';
+            
+            // 隐藏提示信息
+            document.getElementById('typeEditHint').style.display = 'none';
+            
+            // 重置类型选择（恢复可点击状态）
+            document.querySelectorAll('.type-card').forEach(card => {
+                card.classList.remove('selected');
+                card.style.pointerEvents = 'auto';
+                card.style.opacity = '1';
+                if (card.getAttribute('data-type') === '开心刮刮乐') {
+                    card.classList.add('selected');
+                }
+            });
+            
+            renderPrizeList();
+            document.getElementById('createModal').classList.add('active');
+        }
+
+        // 关闭创建弹窗
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.remove('active');
+            editingLotteryId = null;
+            selectedLotteryType = '开心刮刮乐';
+            prizeList = [];
+            editingPrizeIndex = -1;
+            isAddingPrize = false;
+            
+            // 重置表单
+            document.getElementById('lotteryTitle').value = '';
+            document.getElementById('modalTitle').textContent = '创建抽奖活动';
+            document.getElementById('submitBtn').textContent = '生成抽奖活动';
+            
+            // 隐藏提示信息
+            document.getElementById('typeEditHint').style.display = 'none';
+            
+            // 重置类型选择（恢复可点击状态）
+            document.querySelectorAll('.type-card').forEach(card => {
+                card.classList.remove('selected');
+                card.style.pointerEvents = 'auto';
+                card.style.opacity = '1';
+                if (card.getAttribute('data-type') === '开心刮刮乐') {
+                    card.classList.add('selected');
+                }
+            });
+        }
+
+        // 预览图片
+        function previewImageFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('previewImage').style.display = 'block';
+                    document.getElementById('uploadPlaceholder').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 创建或更新抽奖活动
+        function createLottery() {
+            const title = document.getElementById('lotteryTitle').value.trim();
+            if (!title) {
+                alert('请输入抽奖标题');
+                return;
+            }
+
+            if (prizeList.length === 0) {
+                alert('请至少添加一个奖品');
+                return;
+            }
+
+            if (editingLotteryId) {
+                // 编辑模式
+                const lottery = allLotteries.find(l => l.id === editingLotteryId);
+                if (lottery) {
+                    lottery.title = title;
+                    lottery.type = selectedLotteryType;
+                    lottery.prizes = [...prizeList];
+                    
+                    // 同步到当前显示列表
+                    const displayLottery = lotteries.find(l => l.id === editingLotteryId);
+                    if (displayLottery) {
+                        displayLottery.title = title;
+                        displayLottery.type = selectedLotteryType;
+                        displayLottery.prizes = [...prizeList];
+                    }
+                    
+                    alert('抽奖活动已更新！');
+                }
+            } else {
+                // 创建模式
+                const newId = Math.max(...allLotteries.map(l => l.id), 0) + 1;
+                const gradientIndex = (newId - 1) % gradients.length;
+                
+                const newLottery = {
+                    id: newId,
+                    title: title,
+                    gradient: gradients[gradientIndex],
+                    type: selectedLotteryType,
+                    createTime: new Date().toISOString().split('T')[0],
+                    prizes: [...prizeList]
+                };
+
+                allLotteries.unshift(newLottery);
+                lotteries.unshift(newLottery);
+                
+                alert('抽奖活动创建成功！');
+            }
+
+            renderLotteryList();
+            closeCreateModal();
+        }
+
+        // 搜索功能
+        function searchLottery() {
+            const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+            
+            if (!keyword) {
+                // 如果搜索框为空，显示所有活动
+                lotteries = [...allLotteries];
+            } else {
+                // 根据关键词过滤
+                lotteries = allLotteries.filter(lottery => 
+                    lottery.title.toLowerCase().includes(keyword) ||
+                    lottery.type.toLowerCase().includes(keyword) ||
+                    lottery.prizes.some(prize => prize.toLowerCase().includes(keyword))
+                );
+            }
+            
+            renderLotteryList();
+            
+            // 显示搜索结果提示
+            if (keyword && lotteries.length === 0) {
+                const grid = document.getElementById('lotteryGrid');
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">🔍</div>
+                        <div class="empty-state-text">未找到"${keyword}"相关的抽奖活动</div>
+                    </div>
+                `;
+            }
+        }
+
+        // 支持回车搜索
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        searchLottery();
+                    }
+                });
+            }
+        });
+
+        // 分页功能
+        function prevPage() {
+            const currentPage = document.getElementById('currentPage');
+            if (currentPage.value > 1) {
+                currentPage.value = parseInt(currentPage.value) - 1;
+            }
+        }
+
+        function nextPage() {
+            const currentPage = document.getElementById('currentPage');
+            currentPage.value = parseInt(currentPage.value) + 1;
+        }
+
+        // 奖品标签点击切换
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.prize-tag').forEach(tag => {
+                tag.onclick = function() {
+                    this.classList.toggle('selected');
+                };
+            });
+        });
+
+        // 点击弹窗外部关闭
+        document.addEventListener('DOMContentLoaded', function() {
+            const createModal = document.getElementById('createModal');
+            const deleteModal = document.getElementById('deleteModal');
+            const deletePrizeModal = document.getElementById('deletePrizeModal');
+            
+            if (createModal) {
+                createModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeCreateModal();
+                    }
+                });
+            }
+            
+            if (deleteModal) {
+                deleteModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeDeleteModal();
+                    }
+                });
+            }
+            
+            if (deletePrizeModal) {
+                deletePrizeModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeDeletePrizeModal();
+                    }
+                });
+            }
+        });
+
+        // 初始化
+        init();
+    </script>
+</body>
+</html>

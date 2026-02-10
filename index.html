@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -1056,6 +1056,255 @@
             opacity: 0.5;
         }
 
+        /* 抽奖模式选择器 */
+        .lottery-mode-selector {
+            position: absolute;
+            top: 15px;
+            left: 80px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 8px 15px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .mode-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 15px;
+            transition: all 0.3s;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .mode-option:hover {
+            background: rgba(255,105,180,0.1);
+        }
+
+        .mode-option.active {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+            font-weight: 600;
+        }
+
+        .mode-radio {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ff69b4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .mode-option.active .mode-radio {
+            border-color: white;
+        }
+
+        .mode-radio::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: transparent;
+            transition: all 0.3s;
+        }
+
+        .mode-option.active .mode-radio::after {
+            background: white;
+        }
+
+        .mode-hint {
+            font-size: 12px;
+            color: #999;
+            margin-left: 5px;
+        }
+
+        /* 学生名单侧边栏 */
+        .student-sidebar {
+            position: fixed;
+            left: 0;
+            top: 70px;
+            bottom: 0;
+            width: 300px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            display: none;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .student-sidebar.active {
+            display: flex;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-stats {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .student-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .student-item:hover {
+            background: #e9ecef;
+        }
+
+        .student-item.selected {
+            background: #e8f0fe;
+            border-color: #2B5FED;
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .student-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .student-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .student-prize {
+            font-size: 12px;
+            color: #ff69b4;
+            font-weight: 500;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* 抽奖记录按钮 */
+        .record-btn {
+            position: absolute;
+            top: 15px;
+            right: 60px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.8);
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            color: #ff69b4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .record-btn:hover {
+            background: rgba(255,255,255,0.95);
+            transform: scale(1.1);
+        }
+
+        /* 抽奖记录弹窗 */
+        .record-modal {
+            max-width: 700px;
+        }
+
+        .record-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .record-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .record-item:last-child {
+            border-bottom: none;
+        }
+
+        .record-info {
+            flex: 1;
+        }
+
+        .record-student {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .record-prize {
+            font-size: 13px;
+            color: #ff69b4;
+        }
+
+        .record-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .record-empty {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .record-empty-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
         .scratch-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -1706,16 +1955,6 @@
 
         .type-card.selected .type-card-name {
             color: #1890ff;
-        }
-
-        .type-card-badge {
-            display: inline-block;
-            background: #52c41a;
-            color: white;
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 8px;
-            margin-top: 4px;
         }
 
         .modal-footer {
@@ -2869,10 +3108,42 @@
     <div class="scratch-game-page" id="gamePage">
         <div class="game-header">
             <button class="music-toggle-btn" id="musicToggleBtn" onclick="toggleGameMusic()">🔊</button>
+            
+            <!-- 抽奖模式选择器 -->
+            <div class="lottery-mode-selector">
+                <div class="mode-option active" onclick="selectLotteryMode('lucky')">
+                    <div class="mode-radio"></div>
+                    <span>幸运抽奖</span>
+                    <span class="mode-hint">口头指定学生抽奖</span>
+                </div>
+                <div class="mode-option" onclick="selectLotteryMode('exclusive')">
+                    <div class="mode-radio"></div>
+                    <span>专属抽奖</span>
+                    <span class="mode-hint">先选中指定学生抽奖</span>
+                </div>
+            </div>
+            
+            <!-- 抽奖记录按钮 -->
+            <button class="record-btn" onclick="openRecordModal()" title="查看抽奖记录">📋</button>
+            
             <h1 class="game-title" id="gameTitle">
                 抽奖游戏
             </h1>
             <button class="close-game-btn" onclick="closeGame()">✕</button>
+        </div>
+
+        <!-- 学生名单侧边栏 -->
+        <div class="student-sidebar" id="studentSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">学生名单</div>
+                <div class="sidebar-stats">
+                    <span>总人数：<span id="totalStudents">0</span></span> | 
+                    <span>已抽奖：<span id="drawnStudents">0</span></span>
+                </div>
+            </div>
+            <div class="sidebar-content" id="studentList">
+                <!-- 学生列表将动态生成 -->
+            </div>
         </div>
 
         <!-- 刮刮乐游戏 -->
@@ -2945,7 +3216,6 @@
                         <div class="type-card selected" data-type="开心刮刮乐" onclick="selectLotteryType(this)">
                             <div class="type-card-icon">🎨</div>
                             <div class="type-card-name">开心刮刮乐</div>
-                            <div class="type-card-badge">推荐</div>
                         </div>
                         <div class="type-card" data-type="幸运转盘" onclick="selectLotteryType(this)">
                             <div class="type-card-icon">🎡</div>
@@ -2963,7 +3233,7 @@
 
                 <div class="form-group">
                     <label class="form-label required">奖品信息：</label>
-                    <div style="color: #999; font-size: 12px; margin-bottom: 8px;">💡 最多添加9个奖品信息，不足9个的为"谢谢参与"</div>
+                    <div id="prizeHint" style="color: #999; font-size: 12px; margin-bottom: 8px;">💡 最多添加9个奖品信息，不足9个的为"谢谢参与"</div>
                     <div class="prize-tags" id="prizeTags">
                         <!-- 奖品标签将动态生成 -->
                     </div>
@@ -3003,6 +3273,24 @@
             <div class="modal-footer">
                 <button class="btn btn-cancel" onclick="closeDeletePrizeModal()">取消</button>
                 <button class="btn btn-primary" style="background: #ff4d4f;" onclick="confirmDeletePrize()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 抽奖记录弹窗 -->
+    <div class="modal-overlay" id="recordModal">
+        <div class="modal record-modal">
+            <div class="modal-header">
+                <span>抽奖记录</span>
+                <button class="close-btn" onclick="closeRecordModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="record-list" id="recordList">
+                    <!-- 抽奖记录将动态生成 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeRecordModal()">确定</button>
             </div>
         </div>
     </div>
@@ -3084,15 +3372,15 @@
                 title: '自主学习之星摇奖活动',
                 gradient: gradients[0],
                 type: '开心刮刮乐',
-                createTime: '2026-01-08',
+                createTime: '2026/01/08 06:18',
                 prizes: ['奖励书一本', '奖励铅笔一支', '奖励礼品一份']
             },
             {
                 id: 2,
-                title: '月度优秀员工抽奖',
+                title: '月度优秀学生抽奖',
                 gradient: gradients[1],
                 type: '开心刮刮乐',
-                createTime: '2026-01-07',
+                createTime: '2026/01/07 06:18',
                 prizes: ['现金红包', '购物卡', '电影票']
             },
             {
@@ -3100,39 +3388,39 @@
                 title: '新年幸运大抽奖',
                 gradient: gradients[2],
                 type: '开心刮刮乐',
-                createTime: '2026-01-06',
+                createTime: '2026/01/06 06:18',
                 prizes: ['手机', '平板电脑', '蓝牙耳机']
             },
             {
                 id: 4,
-                title: '团队建设活动抽奖',
+                title: '期中考试活动抽奖',
                 gradient: gradients[3],
                 type: '幸运转盘',
-                createTime: '2026-01-05',
+                createTime: '2026/01/05 06:18',
                 prizes: ['旅游券', '健身卡', '美食券']
             },
             {
                 id: 5,
-                title: '客户答谢抽奖活动',
+                title: '期末考试抽奖活动',
                 gradient: gradients[4],
                 type: '幸运转盘',
-                createTime: '2026-01-04',
+                createTime: '2026/01/04 06:18',
                 prizes: ['礼品套装', '优惠券', '积分奖励']
             },
             {
                 id: 6,
-                title: '季度销售冠军抽奖',
+                title: '编程之星抽奖',
                 gradient: gradients[5],
                 type: '幸运转盘',
-                createTime: '2026-01-03',
+                createTime: '2026/01/03 06:18',
                 prizes: ['奖金', '奖杯', '荣誉证书']
             },
             {
                 id: 7,
-                title: '周年庆典抽奖活动',
+                title: 'AI学伴抽奖活动',
                 gradient: gradients[6],
                 type: '九宫格',
-                createTime: '2026-01-02',
+                createTime: '2026/01/02 06:18',
                 prizes: ['笔记本电脑', '智能手表', '无线耳机']
             },
             {
@@ -3140,23 +3428,23 @@
                 title: '员工生日会抽奖',
                 gradient: gradients[7],
                 type: '九宫格',
-                createTime: '2026-01-01',
+                createTime: '2026/01/01 06:18',
                 prizes: ['生日蛋糕券', '鲜花', '礼品卡']
             },
             {
                 id: 9,
-                title: '项目完成庆祝抽奖',
+                title: '国庆学习之星抽奖',
                 gradient: gradients[8],
                 type: '九宫格',
-                createTime: '2025-12-30',
+                createTime: '2025/12/30 06:18',
                 prizes: ['团队聚餐', '休假券', '奖金']
             },
             {
                 id: 10,
-                title: '年终感恩回馈抽奖',
+                title: '自主学习抽奖',
                 gradient: gradients[9],
                 type: '九宫格',
-                createTime: '2025-12-29',
+                createTime: '2025/12/29 06:18',
                 prizes: ['年终奖', '购物卡', '旅游基金']
             },
             {
@@ -3164,31 +3452,31 @@
                 title: '春节特别抽奖活动',
                 gradient: gradients[0],
                 type: '九宫格',
-                createTime: '2025-12-28',
+                createTime: '2025-12-28 06:18',
                 prizes: ['红包', '福袋', '新年礼盒']
             },
             {
                 id: 12,
-                title: '员工福利大抽奖',
+                title: '学生福利大抽奖',
                 gradient: gradients[1],
                 type: '九宫格',
-                createTime: '2025-12-27',
+                createTime: '2025/12/27 06:18',
                 prizes: ['健康体检', '健身年卡', '电影年卡']
             },
             {
                 id: 13,
-                title: '新品发布会抽奖',
+                title: 'AI学习抽奖',
                 gradient: gradients[2],
                 type: '九宫格',
-                createTime: '2025-12-26',
+                createTime: '2025/12/26 06:18',
                 prizes: ['新品试用', '优惠券', '周边礼品']
             },
             {
                 id: 14,
-                title: '会员专属抽奖',
+                title: '前10名专属抽奖',
                 gradient: gradients[3],
                 type: '九宫格',
-                createTime: '2025-12-25',
+                createTime: '2025/12/25 06:18',
                 prizes: ['会员升级', '积分翻倍', '专属礼包']
             },
             {
@@ -3196,7 +3484,7 @@
                 title: '圣诞节惊喜抽奖',
                 gradient: gradients[4],
                 type: '九宫格',
-                createTime: '2025-12-24',
+                createTime: '2025/12/24 06:18',
                 prizes: ['圣诞礼物', '节日红包', '神秘大奖']
             }
         ];
@@ -3209,6 +3497,25 @@
         let allLotteries = []; // 保存所有数据用于搜索
         let selectedLotteryType = '开心刮刮乐'; // 当前选中的抽奖类型
         let prizeList = []; // 奖品列表
+        
+        // 抽奖模式相关变量
+        let lotteryMode = 'lucky'; // 'lucky' 幸运抽奖 或 'exclusive' 专属抽奖
+        let selectedStudent = null; // 当前选中的学生
+        let lotteryRecords = []; // 抽奖记录
+        
+        // 模拟学生数据
+        const students = [
+            { id: 1, name: '张三', avatar: '张' },
+            { id: 2, name: '李四', avatar: '李' },
+            { id: 3, name: '王五', avatar: '王' },
+            { id: 4, name: '赵六', avatar: '赵' },
+            { id: 5, name: '钱七', avatar: '钱' },
+            { id: 6, name: '孙八', avatar: '孙' },
+            { id: 7, name: '周九', avatar: '周' },
+            { id: 8, name: '吴十', avatar: '吴' },
+            { id: 9, name: '郑十一', avatar: '郑' },
+            { id: 10, name: '王十二', avatar: '王' }
+        ];
         let editingPrizeIndex = -1; // 正在编辑的奖品索引
         let isAddingPrize = false; // 是否正在添加奖品
         let gameMusicEnabled = true; // 游戏音乐开关状态
@@ -3286,7 +3593,7 @@
                         <div class="prd-section-title">功能逻辑</div>
                         <div class="prd-section-content">
                             <ul>
-                                <li><strong>列表展示：</strong>以卡片形式展示抽奖活动，包含封面图、标题、类型标签、创建时间、奖品数量</li>
+                                <li><strong>列表展示：</strong>以卡片形式展示抽奖活动，包含封面图（每种抽奖类型一个封面图）、标题（当标题超过卡片宽度时显示省略号）、类型标签（活动类型名称）、创建时间（年-月-日 时：分）、奖品数量（实际的奖品数量）</li>
                                 <li><strong>筛选功能：</strong>支持按时间段（近一周/近一个月/近六个月/近一年/全部）和类型（开心刮刮乐/幸运转盘/九宫格）筛选，默认选中"全部"</li>
                                 <li><strong>搜索功能：</strong>支持按标题关键字搜索</li>
                                 <li><strong>分页功能：</strong>支持设置每页显示数量（10/20/30/40/50/100条），默认20条/页，支持上一页/下一页切换</li>
@@ -3319,15 +3626,15 @@
                         <div class="prd-section-title">功能逻辑</div>
                         <div class="prd-section-content">
                             <ul>
-                                <li><strong>基本信息：</strong>抽奖标题（必填）、抽奖类型（开心刮刮乐/幸运转盘/九宫格）</li>
+                                <li><strong>基本信息：</strong>抽奖标题（必填，不超过20个字）、抽奖类型（开心刮刮乐/幸运转盘/九宫格）</li>
                                 <li><strong>奖品配置：</strong>
                                     <ul>
-                                        <li>支持添加最多9个奖品</li>
-                                        <li>每个奖品包含：奖品名称、奖品图片（可选）</li>
-                                        <li>不足9个奖品时，自动填充"谢谢参与"</li>
+                                        <li>开心刮刮乐/九宫格：最多添加9个奖品，不足9个的为"谢谢参与"</li>
+                                        <li>幸运转盘：最多添加10个奖品，系统将按实际添加数量显示</li>
+                                        <li>每个奖品包含：奖品名称和一个统一用的奖品图标</li>
                                     </ul>
                                 </li>
-                                <li><strong>数据验证：</strong>标题不能为空，至少添加1个奖品</li>
+                                <li><strong>数据验证：</strong>标题不能为空，不超过20个字；至少添加1个奖品，奖品字数不超过50字</li>
                             </ul>
                         </div>
                     </div>
@@ -3335,7 +3642,7 @@
                         <div class="prd-section-title">交互逻辑</div>
                         <div class="prd-section-content">
                             <ul>
-                                <li>选择抽奖类型后，显示对应的类型卡片高亮效果</li>
+                                <li>选择抽奖类型后，显示对应的类型卡片高亮效果，并更新奖品配置提示语</li>
                                 <li>点击"添加奖品"按钮，新增奖品输入框</li>
                                 <li>点击奖品右侧"×"按钮，删除该奖品</li>
                                 <li>点击"确定"按钮，保存活动并显示成功提示（顶部Toast）</li>
@@ -3351,7 +3658,7 @@
                     <div class="prd-section">
                         <div class="prd-section-title">功能描述</div>
                         <div class="prd-section-content">
-                            刮刮乐抽奖游戏，用户通过刮开卡片涂层查看中奖结果。
+                            刮刮乐抽奖游戏，用户通过刮开卡片涂层查看中奖结果。支持幸运抽奖和专属抽奖两种模式。
                         </div>
                     </div>
                     <div class="prd-section">
@@ -3360,13 +3667,23 @@
                             <ul>
                                 <li><strong>游戏界面：</strong>3×3网格布局，共9张刮刮卡</li>
                                 <li><strong>奖品分配：</strong>随机将配置的奖品分配到9张卡片中</li>
+                                <li><strong>抽奖模式：</strong>
+                                    <ul>
+                                        <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
+                                        <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击或在刮奖区域按下提示“请先选择学生后再抽奖”，选中学生可以直接刮奖。</li>
+                                        <li>学生名单显示在音乐按钮下方的左侧侧边栏，学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
+                                    </ul>
+                                </li>
                                 <li><strong>刮奖机制：</strong>
                                     <ul>
                                         <li>鼠标/手指按下开始刮奖，移动鼠标/手指刮开涂层</li>
-                                        <li>刮开面积达到30%时自动显示完整奖品</li>
+                                        <li>刮开面积达到10%时自动显示完整奖品</li>
+                                        <li>弹窗显示中奖结果：抽中奖品显示"恭喜中奖"和奖品名称，抽中"谢谢参与"显示"很遗憾，未抽中奖品"</li>
+                                        <li>弹窗3秒后自动关闭</li>
                                     </ul>
                                 </li>
                                 <li><strong>音乐控制：</strong>左上角音乐开关按钮，控制背景音乐播放</li>
+                                <li><strong>抽奖记录：</strong>支持查看该活动的历史抽奖记录</li>
                             </ul>
                         </div>
                     </div>
@@ -3374,8 +3691,12 @@
                         <div class="prd-section-title">交互逻辑</div>
                         <div class="prd-section-content">
                             <ul>
+                                <li>选择抽奖模式：点击"幸运抽奖"或"专属抽奖"切换模式</li>
+                                <li>专属抽奖模式：左侧显示学生名单（位于音乐按钮下方），点击选中学生后才能抽奖</li>
                                 <li>鼠标/手指按下并移动：刮开涂层</li>
-                                <li>刮开达到阈值：自动显示奖品并弹出提示</li>
+                                <li>刮开达到阈值：自动显示奖品并弹出提示，记录抽奖结果</li>
+                                <li>点击弹窗"确定"按钮或弹窗外部区域：立即关闭弹窗</li>
+                                <li>点击抽奖记录按钮：查看该活动的历史抽奖记录</li>
                                 <li>点击音乐按钮：切换音乐播放状态（🔊/🔇）</li>
                                 <li>点击关闭按钮：返回抽奖活动列表</li>
                             </ul>
@@ -3389,25 +3710,33 @@
                     <div class="prd-section">
                         <div class="prd-section-title">功能描述</div>
                         <div class="prd-section-content">
-                            转盘抽奖游戏，用户点击"抽奖"按钮转动转盘，指针停止位置为中奖结果。
+                            转盘抽奖游戏，用户点击"抽奖"按钮转动转盘，指针停止位置为中奖结果。支持幸运抽奖和专属抽奖两种模式。
                         </div>
                     </div>
                     <div class="prd-section">
                         <div class="prd-section-title">功能逻辑</div>
                         <div class="prd-section-content">
                             <ul>
-                                <li><strong>转盘界面：</strong>圆形转盘，根据奖品数量平均分割扇形区域</li>
-                                <li><strong>奖品展示：</strong>每个扇形区域显示奖品名称和图标</li>
+                                <li><strong>转盘界面：</strong>圆形转盘，根据奖品数量平均分割扇形区域（最多10个）</li>
+                                <li><strong>奖品展示：</strong>每个扇形区域显示奖品名称和图标，添加几个奖品就显示几个扇形</li>
+                                <li><strong>抽奖模式：</strong>
+                                    <ul>
+                                        <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
+                                        <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击抽奖提示“请先选择学生后再抽奖”，选中学生可以直接点击抽奖。</li>
+                                        <li>学生名单显示在音乐按钮下方的左侧侧边栏，学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
+                                    </ul>
+                                </li>
                                 <li><strong>转动机制：</strong>
                                     <ul>
                                         <li>点击中心"抽奖"按钮开始转动</li>
                                         <li>转盘旋转3-5秒后减速停止</li>
                                         <li>指针指向的扇形区域为中奖奖品</li>
-                                        <li>弹窗显示中奖结果：抽中奖品显示"恭喜中奖"和奖品名称，抽中"谢谢参与"显示"很遗憾，未抽中奖品"</li>
+                                        <li>弹窗显示中奖结果：显示"恭喜中奖"和奖品名称</li>
                                         <li>弹窗3秒后自动关闭</li>
                                     </ul>
                                 </li>
                                 <li><strong>防重复点击：</strong>转动过程中禁用抽奖按钮</li>
+                                <li><strong>抽奖记录：</strong>支持查看该活动的历史抽奖记录</li>
                             </ul>
                         </div>
                     </div>
@@ -3415,10 +3744,13 @@
                         <div class="prd-section-title">交互逻辑</div>
                         <div class="prd-section-content">
                             <ul>
+                                <li>选择抽奖模式：点击"幸运抽奖"或"专属抽奖"切换模式</li>
+                                <li>专属抽奖模式：左侧显示学生名单（位于音乐按钮下方），点击选中学生后才能抽奖</li>
                                 <li>点击"抽奖"按钮：开始转动转盘</li>
                                 <li>转动过程：按钮文字变为"抽奖中..."，禁用点击</li>
-                                <li>转动结束：弹窗显示中奖结果，3秒倒计时后自动关闭</li>
+                                <li>转动结束：弹窗显示中奖结果，记录抽奖结果，3秒倒计时后自动关闭</li>
                                 <li>点击弹窗"确定"按钮或弹窗外部区域：立即关闭弹窗</li>
+                                <li>点击抽奖记录按钮：查看该活动的历史抽奖记录</li>
                                 <li>点击音乐按钮：切换音乐播放状态</li>
                                 <li>点击关闭按钮：返回抽奖活动列表</li>
                             </ul>
@@ -3432,15 +3764,22 @@
                     <div class="prd-section">
                         <div class="prd-section-title">功能描述</div>
                         <div class="prd-section-content">
-                            九宫格跑马灯抽奖游戏，格子依次高亮，停止位置为中奖结果。
+                            九宫格跑马灯抽奖游戏，格子依次高亮，停止位置为中奖结果。支持幸运抽奖和专属抽奖两种模式。
                         </div>
                     </div>
                     <div class="prd-section">
                         <div class="prd-section-title">功能逻辑</div>
                         <div class="prd-section-content">
                             <ul>
-                                <li><strong>游戏界面：</strong>3×3网格布局，底部为"开始抽奖"按钮，上面9个格子显示奖品</li>
+                                <li><strong>游戏界面：</strong>3×3网格布局，中心为"开始抽奖"按钮，周围8个格子显示奖品</li>
                                 <li><strong>奖品展示：</strong>每个格子显示奖品图标和名称</li>
+                                <li><strong>抽奖模式：</strong>
+                                    <ul>
+                                        <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
+                                        <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击开始抽奖提示“请先选择学生后再抽奖”，选中学生可以直接点击开始抽奖。</li>
+                                        <li>学生名单显示在音乐按钮下方的左侧侧边栏，学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
+                                    </ul>
+                                </li>
                                 <li><strong>跑马灯机制：</strong>
                                     <ul>
                                         <li>点击"开始抽奖"按钮，格子按顺时针方向依次高亮</li>
@@ -3451,6 +3790,7 @@
                                     </ul>
                                 </li>
                                 <li><strong>防重复点击：</strong>抽奖过程中禁用开始按钮</li>
+                                <li><strong>抽奖记录：</strong>支持查看该活动的历史抽奖记录</li>
                             </ul>
                         </div>
                     </div>
@@ -3458,10 +3798,13 @@
                         <div class="prd-section-title">交互逻辑</div>
                         <div class="prd-section-content">
                             <ul>
+                                <li>选择抽奖模式：点击"幸运抽奖"或"专属抽奖"切换模式</li>
+                                <li>专属抽奖模式：左侧显示学生名单（位于音乐按钮下方），点击选中学生后才能抽奖</li>
                                 <li>点击"开始抽奖"按钮：启动跑马灯抽奖</li>
                                 <li>抽奖过程：格子依次高亮，按钮禁用</li>
-                                <li>抽奖结束：中奖格子保持高亮，弹窗显示中奖结果，3秒倒计时后自动关闭</li>
+                                <li>抽奖结束：中奖格子保持高亮，弹窗显示中奖结果，记录抽奖结果，3秒倒计时后自动关闭</li>
                                 <li>点击弹窗"确定"按钮或弹窗外部区域：立即关闭弹窗</li>
+                                <li>点击抽奖记录按钮：查看该活动的历史抽奖记录</li>
                                 <li>点击音乐按钮：切换音乐播放状态</li>
                                 <li>点击关闭按钮：返回抽奖活动列表</li>
                             </ul>
@@ -3669,6 +4012,14 @@
                         card.classList.add('selected');
                     }
                 });
+                
+                // 根据类型设置奖品信息提示语
+                const prizeHint = document.getElementById('prizeHint');
+                if (lottery.type === '幸运转盘') {
+                    prizeHint.textContent = '💡 最多添加10个奖品信息，系统将按实际添加数量显示';
+                } else {
+                    prizeHint.textContent = '💡 最多添加9个奖品信息，不足9个的为"谢谢参与"';
+                }
                 
                 // 渲染奖品列表
                 renderPrizeList();
@@ -3918,6 +4269,12 @@
         }
 
         function showWheelResult(prize) {
+            // 检查专属抽奖模式下是否选择了学生
+            if (lotteryMode === 'exclusive' && !selectedStudent) {
+                showToast('请先选择学生后再抽奖', 'warning');
+                return;
+            }
+            
             const resultIcon = document.querySelector('#wheelResultModal .result-icon');
             const resultTitle = document.querySelector('#wheelResultModal .result-title');
             const resultPrize = document.getElementById('resultPrize');
@@ -3932,6 +4289,9 @@
                 resultTitle.textContent = '恭喜中奖';
                 resultPrize.textContent = prize;
             }
+            
+            // 记录抽奖结果
+            recordLotteryResult(prize);
             
             document.getElementById('wheelResultModal').classList.add('active');
             
@@ -4044,7 +4404,7 @@
             board.innerHTML = '';
             
             const prizes = currentLottery.prizes;
-            const icons = ['🎁', '🏆', '⭐', '💎', '🎯', '🎪', '🎨', '🎭', '🎸'];
+            const icons = ['🎁', '🎁', '🎁', '🎁', '🎁', '🎁', '🎁', '🎁', '🎁'];
             
             // 创建奖品数组（9个位置）
             const gridPrizes = [];
@@ -4118,7 +4478,7 @@
                     }, 500);
                 }
             }, speed);
-        }
+        }        
 
         // ========== 扭蛋机 ==========
         let capsuleDrawing = false;
@@ -4402,6 +4762,147 @@
             document.getElementById('gamePage').classList.remove('active');
             document.querySelector('.header').style.display = 'block';
             document.getElementById('listPage').style.display = 'flex';
+            
+            // 重置抽奖模式
+            lotteryMode = 'lucky';
+            selectedStudent = null;
+            document.getElementById('studentSidebar').classList.remove('active');
+        }
+
+        // 选择抽奖模式
+        function selectLotteryMode(mode) {
+            lotteryMode = mode;
+            
+            // 更新UI
+            document.querySelectorAll('.mode-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // 显示/隐藏学生侧边栏
+            const sidebar = document.getElementById('studentSidebar');
+            if (mode === 'exclusive') {
+                sidebar.classList.add('active');
+                renderStudentList();
+            } else {
+                sidebar.classList.remove('active');
+                selectedStudent = null;
+            }
+        }
+
+        // 渲染学生列表
+        function renderStudentList() {
+            const container = document.getElementById('studentList');
+            container.innerHTML = '';
+            
+            // 统计已抽奖学生数
+            const drawnCount = students.filter(s => {
+                return lotteryRecords.some(r => r.studentId === s.id && r.lotteryId === currentLottery.id);
+            }).length;
+            
+            document.getElementById('totalStudents').textContent = students.length;
+            document.getElementById('drawnStudents').textContent = drawnCount;
+            
+            students.forEach(student => {
+                // 查找该学生在当前活动中的抽奖记录
+                const record = lotteryRecords.find(r => 
+                    r.studentId === student.id && r.lotteryId === currentLottery.id
+                );
+                
+                const item = document.createElement('div');
+                item.className = 'student-item';
+                if (selectedStudent && selectedStudent.id === student.id) {
+                    item.classList.add('selected');
+                }
+                
+                item.innerHTML = `
+                    <div class="student-info">
+                        <div class="student-avatar">${student.avatar}</div>
+                        <div class="student-name">${student.name}</div>
+                    </div>
+                    ${record ? `<div class="student-prize">${record.prize}</div>` : ''}
+                `;
+                
+                item.onclick = () => selectStudent(student);
+                container.appendChild(item);
+            });
+        }
+
+        // 选择学生
+        function selectStudent(student) {
+            if (lotteryMode !== 'exclusive') return;
+            
+            selectedStudent = student;
+            renderStudentList();
+        }
+
+        // 记录抽奖结果
+        function recordLotteryResult(prize) {
+            const record = {
+                id: Date.now(),
+                lotteryId: currentLottery.id,
+                lotteryTitle: currentLottery.title,
+                lotteryType: currentLottery.type,
+                studentId: lotteryMode === 'exclusive' && selectedStudent ? selectedStudent.id : null,
+                studentName: lotteryMode === 'exclusive' && selectedStudent ? selectedStudent.name : '口头指定',
+                prize: prize,
+                mode: lotteryMode,
+                time: new Date().toLocaleString('zh-CN', { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                })
+            };
+            
+            lotteryRecords.unshift(record);
+            
+            // 如果是专属抽奖，更新学生列表
+            if (lotteryMode === 'exclusive') {
+                renderStudentList();
+                selectedStudent = null; // 抽奖后清除选中状态
+            }
+        }
+
+        // 打开抽奖记录弹窗
+        function openRecordModal() {
+            renderRecordList();
+            document.getElementById('recordModal').classList.add('active');
+        }
+
+        // 关闭抽奖记录弹窗
+        function closeRecordModal() {
+            document.getElementById('recordModal').classList.remove('active');
+        }
+
+        // 渲染抽奖记录列表
+        function renderRecordList() {
+            const container = document.getElementById('recordList');
+            
+            // 筛选当前活动的记录
+            const currentRecords = lotteryRecords.filter(r => r.lotteryId === currentLottery.id);
+            
+            if (currentRecords.length === 0) {
+                container.innerHTML = `
+                    <div class="record-empty">
+                        <div class="record-empty-icon">📋</div>
+                        <div>暂无抽奖记录</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = currentRecords.map(record => `
+                <div class="record-item">
+                    <div class="record-info">
+                        <div class="record-student">${record.studentName}</div>
+                        <div class="record-prize">🎁 ${record.prize}</div>
+                    </div>
+                    <div class="record-time">${record.time}</div>
+                </div>
+            `).join('');
         }
 
         // 生成刮刮卡
@@ -4481,7 +4982,7 @@
             ctx.font = '40px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            const icons = ['🔍', '🎁', '🏆', '⭐', '🎨', '🎪'];
+            const icons = ['🎁', '🎁', '🎁', '🎁', '🎁', '🎁'];
             const randomIcon = icons[Math.floor(Math.random() * icons.length)];
             ctx.fillText(randomIcon, canvas.width / 2, canvas.height / 2);
             
@@ -4555,7 +5056,7 @@
                 if (isDrawing) {
                     isDrawing = false;
                     // 检查擦除进度
-                    checkScratchProgress(canvas, ctx);
+                    checkScratchProgress(canvas, ctx, index);
                 }
             }
             
@@ -4573,7 +5074,7 @@
         }
 
         // 检查擦除进度
-        function checkScratchProgress(canvas, ctx) {
+        function checkScratchProgress(canvas, ctx, cardIndex) {
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const pixels = imageData.data;
             let transparentPixels = 0;
@@ -4588,12 +5089,28 @@
             const totalPixels = canvas.width * canvas.height;
             const scratchedPercentage = (transparentPixels / totalPixels) * 100;
             
-            // 如果擦除超过50%，自动显示全部
-            if (scratchedPercentage > 50) {
+            // 如果擦除超过10%，自动显示全部并提示中奖
+            if (scratchedPercentage > 10) {
                 canvas.style.opacity = '0';
                 canvas.style.transition = 'opacity 0.3s';
                 setTimeout(() => {
                     canvas.style.display = 'none';
+                    
+                    // 获取奖品信息
+                    const card = document.getElementById(`scratch-card-${cardIndex}`);
+                    const prizeText = card.querySelector('.scratch-card-content').textContent;
+                    
+                    // 专属抽奖模式检查
+                    if (lotteryMode === 'exclusive' && !selectedStudent) {
+                        showToast('请先选择学生后再抽奖', 'warning');
+                        return;
+                    }
+                    
+                    // 记录抽奖结果
+                    recordLotteryResult(prizeText);
+                    
+                    // 显示中奖结果（使用与转盘和九宫格相同的弹窗）
+                    showWheelResult(prizeText);
                 }, 300);
             }
         }
@@ -4608,6 +5125,28 @@
             // 添加选中状态
             card.classList.add('selected');
             selectedLotteryType = card.getAttribute('data-type');
+            
+            // 根据类型更新奖品信息提示语
+            const prizeHint = document.getElementById('prizeHint');
+            if (selectedLotteryType === '幸运转盘') {
+                prizeHint.textContent = '💡 最多添加10个奖品信息，系统将按实际添加数量显示';
+            } else {
+                prizeHint.textContent = '💡 最多添加9个奖品信息，不足9个的为"谢谢参与"';
+            }
+            
+            // 更新添加奖品按钮状态
+            const addBtn = document.getElementById('addPrizeBtn');
+            if (addBtn) {
+                const maxPrizes = selectedLotteryType === '幸运转盘' ? 10 : 9;
+                
+                if (prizeList.length >= maxPrizes) {
+                    addBtn.disabled = true;
+                    addBtn.textContent = `+ 添加奖品（已达上限${maxPrizes}个）`;
+                } else {
+                    addBtn.disabled = false;
+                    addBtn.textContent = `+ 添加奖品（${prizeList.length}/${maxPrizes}）`;
+                }
+            }
         }
 
         // 渲染奖品列表
@@ -4689,12 +5228,15 @@
             // 更新添加按钮状态
             const addBtn = document.getElementById('addPrizeBtn');
             if (addBtn) {
-                if (prizeList.length >= 9) {
+                // 根据抽奖类型设置不同的上限
+                const maxPrizes = selectedLotteryType === '幸运转盘' ? 10 : 9;
+                
+                if (prizeList.length >= maxPrizes) {
                     addBtn.disabled = true;
-                    addBtn.textContent = '+ 添加奖品（已达上限9个）';
+                    addBtn.textContent = `+ 添加奖品（已达上限${maxPrizes}个）`;
                 } else {
                     addBtn.disabled = false;
-                    addBtn.textContent = `+ 添加奖品（${prizeList.length}/9）`;
+                    addBtn.textContent = `+ 添加奖品（${prizeList.length}/${maxPrizes}）`;
                 }
             }
         }
@@ -4704,8 +5246,11 @@
             if (isAddingPrize || editingPrizeIndex !== -1) {
                 return; // 如果正在编辑或添加，不允许再次添加
             }
-            if (prizeList.length >= 9) {
-                alert('最多只能添加9个奖品！');
+            
+            // 根据抽奖类型设置不同的数量限制
+            const maxPrizes = selectedLotteryType === '幸运转盘' ? 10 : 9;
+            if (prizeList.length >= maxPrizes) {
+                alert(`最多只能添加${maxPrizes}个奖品！`);
                 return;
             }
             isAddingPrize = true;
@@ -4718,8 +5263,10 @@
             if (input) {
                 const prizeName = input.value.trim();
                 if (prizeName) {
-                    if (prizeList.length >= 9) {
-                        alert('最多只能添加9个奖品！');
+                    // 根据抽奖类型设置不同的数量限制
+                    const maxPrizes = selectedLotteryType === '幸运转盘' ? 10 : 9;
+                    if (prizeList.length >= maxPrizes) {
+                        alert(`最多只能添加${maxPrizes}个奖品！`);
                         isAddingPrize = false;
                         renderPrizeList();
                         return;
@@ -4834,6 +5381,10 @@
                 }
             });
             
+            // 设置默认提示语（开心刮刮乐）
+            const prizeHint = document.getElementById('prizeHint');
+            prizeHint.textContent = '💡 最多添加9个奖品信息，不足9个的为"谢谢参与"';
+            
             renderPrizeList();
             document.getElementById('createModal').classList.add('active');
         }
@@ -4921,7 +5472,7 @@
                     title: title,
                     gradient: gradients[gradientIndex],
                     type: selectedLotteryType,
-                    createTime: new Date().toISOString().split('T')[0],
+                    createTime: new Date().toISOString().split('T')[1].split(':'),
                     prizes: [...prizeList]
                 };
 
@@ -5166,6 +5717,16 @@
                     }
                 });
             }
+            
+            // 抽奖记录弹窗点击外部关闭
+            const recordModal = document.getElementById('recordModal');
+            if (recordModal) {
+                recordModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeRecordModal();
+                    }
+                });
+            }
         });
 
         // 初始化
@@ -5297,7 +5858,7 @@
                     <p><strong>功能描述：</strong>展示所有已创建的抽奖活动，支持筛选、搜索、创建、编辑、删除操作。</p>
                     <p><strong>功能逻辑：</strong></p>
                     <ul>
-                        <li>列表展示：以卡片形式展示抽奖活动，包含封面图、标题、类型标签、创建时间、奖品数量</li>
+                        <li>列表展示：以卡片形式展示抽奖活动，包含封面图（每种抽奖类型一个封面图）、标题（当标题超过卡片宽度时显示省略号）、类型标签（活动类型名称）、创建时间（年-月-日 时：分）、奖品数量（实际的奖品数量）</li>
                         <li>筛选功能：支持按时间段（近一周/近一个月/近六个月/近一年/全部）和类型（开心刮刮乐/幸运转盘/九宫格）筛选，默认选中"全部"</li>
                         <li>搜索功能：支持按标题关键字搜索</li>
                         <li>分页功能：支持设置每页显示数量（10/20/30/40/50/100条），默认20条/页，支持上一页/下一页切换</li>
@@ -5316,19 +5877,19 @@
                     <p><strong>功能描述：</strong>通过弹窗形式创建或编辑抽奖活动，配置活动基本信息和奖品信息。</p>
                     <p><strong>功能逻辑：</strong></p>
                     <ul>
-                        <li>基本信息：抽奖标题（必填）、抽奖类型（开心刮刮乐/幸运转盘/九宫格）</li>
+                        <li>基本信息：抽奖标题（必填，不超过20个字）、抽奖类型（开心刮刮乐/幸运转盘/九宫格）</li>
                         <li>奖品配置：
                             <ul>
-                                <li>支持添加最多9个奖品</li>
-                                <li>每个奖品包含：奖品名称、奖品图片（可选）</li>
-                                <li>不足9个奖品时，自动填充"谢谢参与"</li>
+                                <li>开心刮刮乐/九宫格：最多添加9个奖品，不足9个的为"谢谢参与"</li>
+                                <li>幸运转盘：最多添加10个奖品，系统将按实际添加数量显示</li>
+                                <li>每个奖品包含：奖品名称和一个统一用的奖品图标</li>
                             </ul>
                         </li>
-                        <li>数据验证：标题不能为空，至少添加1个奖品</li>
+                        <li>数据验证：标题不能为空，不超过20个字；至少添加1个奖品，奖品字数不超过50字</li>
                     </ul>
                     <p><strong>交互逻辑：</strong></p>
                     <ul>
-                        <li>选择抽奖类型后，显示对应的类型卡片高亮效果</li>
+                        <li>选择抽奖类型后，显示对应的类型卡片高亮效果，并更新奖品配置提示语</li>
                         <li>点击"添加奖品"按钮，新增奖品输入框</li>
                         <li>点击奖品右侧"×"按钮，删除该奖品</li>
                         <li>点击"确定"按钮，保存活动并显示成功提示（顶部Toast）</li>
@@ -5338,23 +5899,37 @@
 
                 <div id="section-2-4">
                         <h3>2.4 开心刮刮乐游戏（功能点 #4）</h3>
-                    <p><strong>功能描述：</strong>刮刮乐抽奖游戏，用户通过刮开卡片涂层查看中奖结果。</p>
+                    <p><strong>功能描述：</strong>刮刮乐抽奖游戏，用户通过刮开卡片涂层查看中奖结果。支持幸运抽奖和专属抽奖两种模式。</p>
                     <p><strong>功能逻辑：</strong></p>
                     <ul>
                         <li>游戏界面：3×3网格布局，共9张刮刮卡</li>
                         <li>奖品分配：随机将配置的奖品分配到9张卡片中</li>
+                        <li>抽奖模式：
+                            <ul>
+                                <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
+                                <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击或在刮奖区域按下提示“请先选择学生后再抽奖”，选中学生可以直接刮奖。</li>
+                                <li>学生名单显示在音乐按钮下方的左侧侧边栏，学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
+                            </ul>
+                        </li>
                         <li>刮奖机制：
                             <ul>
                                 <li>鼠标/手指按下开始刮奖，移动鼠标/手指刮开涂层</li>
-                                <li>刮开面积达到30%时自动显示完整奖品</li>
+                                <li>刮开面积达到10%时自动显示完整奖品</li>
+                                <li>弹窗显示中奖结果：抽中奖品显示"恭喜中奖"和奖品名称，抽中"谢谢参与"显示"很遗憾，未抽中奖品"</li>
+                                <li>弹窗3秒后自动关闭</li>
                             </ul>
                         </li>
                         <li>音乐控制：左上角音乐开关按钮，控制背景音乐播放</li>
+                        <li>抽奖记录：支持查看该活动的历史抽奖记录，且抽奖记录按抽奖时间倒序排序，刷新或者下次进入历史抽奖记录依然存在</li>
                     </ul>
                     <p><strong>交互逻辑：</strong></p>
                     <ul>
+                        <li>选择抽奖模式：点击"幸运抽奖"或"专属抽奖"切换模式</li>
+                        <li>专属抽奖模式：左侧显示学生名单（位于音乐按钮下方），点击选中学生后才能抽奖</li>
                         <li>鼠标/手指按下并移动：刮开涂层</li>
-                        <li>刮开达到阈值：自动显示奖品并弹出提示</li>
+                        <li>刮开达到阈值：自动显示奖品并弹出提示，记录抽奖结果</li>
+                        <li>点击弹窗"确定"按钮或弹窗外部区域：立即关闭弹窗</li>
+                        <li>点击抽奖记录按钮：查看该活动的历史抽奖记录</li>
                         <li>点击音乐按钮：切换音乐播放状态（🔊/🔇）</li>
                         <li>点击关闭按钮：返回抽奖活动列表</li>
                     </ul>
@@ -5363,10 +5938,16 @@
                 <div id="section-2-5">
                         <h3>2.5 幸运转盘游戏（功能点 #5）</h3>
                     <p><strong>功能描述：</strong>转盘抽奖游戏，用户点击“抽奖”按钮转动转盘，指针停止位置为中奖结果。</p>
-                    <p><strong>功能逻辑：</strong></p>
                     <ul>
-                        <li>转盘界面：圆形转盘，根据奖品数量平均分割扇形区域</li>
-                        <li>奖品展示：每个扇形区域显示奖品名称和图标</li>
+                        <li>转盘界面：圆形转盘，根据奖品数量平均分割扇形区域（最多10个）</li>
+                        <li>奖品展示：每个扇形区域显示奖品名称和图标，添加几个奖品就显示几个扇形</li>
+                        <li>抽奖模式：
+                            <ul>
+                                <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
+                                <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击抽奖提示“请先选择学生后再抽奖”，选中学生可以直接点击抽奖。</li>
+                                <li>学生名单显示在音乐按钮下方的左侧侧边栏，学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
+                            </ul>
+                        </li>
                         <li>转动机制：
                             <ul>
                                 <li>点击中心"抽奖"按钮开始转动</li>
@@ -5377,13 +5958,17 @@
                             </ul>
                         </li>
                         <li>防重复点击：转动过程中禁用抽奖按钮</li>
+                        <li>抽奖记录：支持查看该活动的历史抽奖记录，且抽奖记录按抽奖时间倒序排序，刷新或者下次进入历史抽奖记录依然存在</li>
                     </ul>
                     <p><strong>交互逻辑：</strong></p>
                     <ul>
+                        <li>选择抽奖模式：点击"幸运抽奖"或"专属抽奖"切换模式</li>
+                        <li>专属抽奖模式：左侧显示学生名单（位于音乐按钮下方），点击选中学生后才能抽奖</li>
                         <li>点击"抽奖"按钮：开始转动转盘</li>
                         <li>转动过程：按钮文字变为"抽奖中..."，禁用点击</li>
-                        <li>转动结束：弹窗显示中奖结果，3秒倒计时后自动关闭</li>
+                        <li>转动结束：弹窗显示中奖结果，记录抽奖结果，3秒倒计时后自动关闭</li>
                         <li>点击弹窗"确定"按钮或弹窗外部区域：立即关闭弹窗</li>
+                        <li>点击抽奖记录按钮：查看该活动的历史抽奖记录，且抽奖记录按抽奖时间倒序排序</li>
                         <li>点击音乐按钮：切换音乐播放状态</li>
                         <li>点击关闭按钮：返回抽奖活动列表</li>
                     </ul>
@@ -5391,27 +5976,39 @@
 
                 <div id="section-2-6">
                         <h3>2.6 九宫格抽奖游戏（功能点 #6）</h3>
-                    <p><strong>功能描述：</strong>九宫格跑马灯抽奖游戏，格子依次高亮，停止位置为中奖结果。</p>
+                    <p><strong>功能描述：</strong>九宫格跑马灯抽奖游戏，格子依次高亮，停止位置为中奖结果。支持幸运抽奖和专属抽奖两种模式。</p>
                     <p><strong>功能逻辑：</strong></p>
                     <ul>
-                        <li>游戏界面：3×3网格布局，底部为"开始抽奖"按钮，上面9个格子显示奖品</li>
+                        <li>游戏界面：3×3网格布局，中心为"开始抽奖"按钮，周围8个格子显示奖品</li>
                         <li>奖品展示：每个格子显示奖品图标和名称</li>
+                        <li>抽奖模式：
+                            <ul>
+                                <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
+                                <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击开始抽奖提示“请先选择学生后再抽奖”，选中学生可以直接点击开始抽奖。</li>
+                                <li>学生名单显示在音乐按钮下方的左侧侧边栏，学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
+                            </ul>
+                        </li>
                         <li>跑马灯机制：
                             <ul>
                                 <li>点击"开始抽奖"按钮，格子按顺时针方向依次高亮</li>
                                 <li>初始速度较快，逐渐减速</li>
                                 <li>停止在随机选中的奖品格子上</li>
-                                <li>显示中奖提示（中心Toast）</li>
+                                <li>弹窗显示中奖结果：抽中奖品显示"恭喜中奖"和奖品名称，抽中"谢谢参与"显示"很遗憾，未抽中奖品"</li>
+                                <li>弹窗3秒后自动关闭</li>
                             </ul>
                         </li>
                         <li>防重复点击：抽奖过程中禁用开始按钮</li>
+                        <li>抽奖记录：支持查看该活动的历史抽奖记录，且抽奖记录按抽奖时间倒序排序，刷新或者下次进入历史抽奖记录依然存在</li>
                     </ul>
                     <p><strong>交互逻辑：</strong></p>
                     <ul>
+                        <li>选择抽奖模式：点击"幸运抽奖"或"专属抽奖"切换模式</li>
+                        <li>专属抽奖模式：左侧显示学生名单（位于音乐按钮下方），点击选中学生后才能抽奖</li>
                         <li>点击"开始抽奖"按钮：启动跑马灯抽奖</li>
                         <li>抽奖过程：格子依次高亮，按钮禁用</li>
-                        <li>抽奖结束：中奖格子保持高亮，弹窗显示中奖结果，3秒倒计时后自动关闭</li>
+                        <li>抽奖结束：中奖格子保持高亮，弹窗显示中奖结果，记录抽奖结果，3秒倒计时后自动关闭</li>
                         <li>点击弹窗"确定"按钮或弹窗外部区域：立即关闭弹窗</li>
+                        <li>点击抽奖记录按钮：查看该活动的历史抽奖记录</li>
                         <li>点击音乐按钮：切换音乐播放状态</li>
                         <li>点击关闭按钮：返回抽奖活动列表</li>
                     </ul>

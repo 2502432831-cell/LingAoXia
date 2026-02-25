@@ -1155,6 +1155,56 @@
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .class-selector {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .class-selector:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .class-selector option {
+            background: #667eea;
+            color: white;
+        }
+
+        /* 学生搜索框 */
+        .student-search {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .student-search input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .student-search input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .student-search input::placeholder {
+            color: #999;
         }
 
         .sidebar-stats {
@@ -1229,7 +1279,7 @@
         .record-btn {
             position: absolute;
             top: 15px;
-            right: 60px;
+            left: 580px;
             width: 40px;
             height: 40px;
             background: rgba(255,255,255,0.8);
@@ -1307,12 +1357,12 @@
 
         .scratch-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
-            width: 100%;
-            max-width: 750px;
             margin: 0 auto;
             padding: 20px;
+            place-items: center;
+            align-content: center;
+            justify-content: center;
         }
 
         /* 游戏容器 */
@@ -1326,7 +1376,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow-y: auto;
+            overflow: hidden;
         }
 
         /* 幸运转盘样式 */
@@ -1658,14 +1708,11 @@
         }
 
         .scratch-card {
-            width: 100%;
-            aspect-ratio: 1;
             background: white;
             border-radius: 20px;
             position: relative;
             overflow: hidden;
             box-shadow: 0 8px 16px rgba(255,105,180,0.3);
-            min-height: 200px;
         }
 
         .scratch-card-content {
@@ -3135,11 +3182,20 @@
         <!-- 学生名单侧边栏 -->
         <div class="student-sidebar" id="studentSidebar">
             <div class="sidebar-header">
-                <div class="sidebar-title">学生名单</div>
+                <div class="sidebar-title">
+                    <span>学生名单</span>
+                    <select class="class-selector" id="classSelector" onchange="filterStudentsByClass()">
+                        <option value="">九年级1班</option>
+                        <!-- 班级选项将动态生成 -->
+                    </select>
+                </div>
                 <div class="sidebar-stats">
                     <span>总人数：<span id="totalStudents">0</span></span> | 
                     <span>已抽奖：<span id="drawnStudents">0</span></span>
                 </div>
+            </div>
+            <div class="student-search">
+                <input type="text" id="studentSearchInput" placeholder="🔍 搜索学生姓名..." oninput="searchStudents()">
             </div>
             <div class="sidebar-content" id="studentList">
                 <!-- 学生列表将动态生成 -->
@@ -3233,7 +3289,7 @@
 
                 <div class="form-group">
                     <label class="form-label required">奖品信息：</label>
-                    <div id="prizeHint" style="color: #999; font-size: 12px; margin-bottom: 8px;">💡 最多添加9个奖品信息，不足9个的为"谢谢参与"</div>
+                    <div id="prizeHint" style="color: #999; font-size: 12px; margin-bottom: 8px;">💡 最多添加30个奖品</div>
                     <div class="prize-tags" id="prizeTags">
                         <!-- 奖品标签将动态生成 -->
                     </div>
@@ -3629,9 +3685,9 @@
                                 <li><strong>基本信息：</strong>抽奖标题（必填，不超过20个字）、抽奖类型（开心刮刮乐/幸运转盘/九宫格）</li>
                                 <li><strong>奖品配置：</strong>
                                     <ul>
-                                        <li>开心刮刮乐/九宫格：最多添加9个奖品，不足9个的为"谢谢参与"</li>
-                                        <li>幸运转盘：最多添加10个奖品，系统将按实际添加数量显示</li>
-                                        <li>每个奖品包含：奖品名称和一个统一用的奖品图标</li>
+                                        <li>开心刮刮乐：最多添加30个奖品，每个奖品包含奖品名称和数量</li>
+                                        <li>幸运转盘：最多添加9种奖品类型，奖品总数最多30个，每个奖品包含奖品名称和数量</li>
+                                        <li>九宫格：最多添加9种奖品类型，奖品总数最多30个，每个奖品包含奖品名称和数量，不足9种的为"谢谢参与"</li>
                                     </ul>
                                 </li>
                                 <li><strong>数据验证：</strong>标题不能为空，不超过20个字；至少添加1个奖品，奖品字数不超过50字</li>
@@ -3643,8 +3699,9 @@
                         <div class="prd-section-content">
                             <ul>
                                 <li>选择抽奖类型后，显示对应的类型卡片高亮效果，并更新奖品配置提示语</li>
-                                <li>点击"添加奖品"按钮，新增奖品输入框</li>
-                                <li>点击奖品右侧"×"按钮，删除该奖品</li>
+                                <li>点击"添加奖品"按钮，新增奖品输入框（开心刮刮乐、幸运转盘和九宫格都显示名称和数量两个输入框）</li>
+                                <li>点击奖品右侧"✏️"按钮，编辑该奖品</li>
+                                <li>点击奖品右侧"🗑️"按钮，删除该奖品</li>
                                 <li>点击"确定"按钮，保存活动并显示成功提示（顶部Toast）</li>
                                 <li>点击"取消"或"×"按钮，关闭弹窗</li>
                             </ul>
@@ -3665,20 +3722,20 @@
                         <div class="prd-section-title">功能逻辑</div>
                         <div class="prd-section-content">
                             <ul>
-                                <li><strong>游戏界面：</strong>3×3网格布局，共9张刮刮卡</li>
-                                <li><strong>奖品分配：</strong>随机将配置的奖品分配到9张卡片中</li>
+                                <li><strong>游戏界面：</strong>根据奖品总数量自适应显示刮刮卡（最多30张），刮刮卡在页面中居中显示，当数量较多时自动缩小卡片尺寸以确保全部显示在页面中，无需滚动条</li>
+                                <li><strong>奖品分配：</strong>根据每个奖品设置的数量生成对应数量的刮刮卡，随机打乱顺序显示</li>
                                 <li><strong>抽奖模式：</strong>
                                     <ul>
                                         <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
                                         <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击或在刮奖区域按下提示“请先选择学生后再抽奖”，选中学生可以直接刮奖。</li>
-                                        <li>学生名单显示在音乐按钮下方的左侧侧边栏，学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
+                                        <li>学生名单显示在音乐按钮下方的左侧侧边栏，侧边栏顶部显示"学生名单"标题和班级下拉框（支持按班级筛选），下方显示搜索框（支持按学生姓名模糊查询），学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
                                     </ul>
                                 </li>
                                 <li><strong>刮奖机制：</strong>
                                     <ul>
                                         <li>鼠标/手指按下开始刮奖，移动鼠标/手指刮开涂层</li>
                                         <li>刮开面积达到10%时自动显示完整奖品</li>
-                                        <li>弹窗显示中奖结果：抽中奖品显示"恭喜中奖"和奖品名称，抽中"谢谢参与"显示"很遗憾，未抽中奖品"</li>
+                                        <li>弹窗显示中奖结果：抽中奖品显示"恭喜中奖"和奖品名称</li>
                                         <li>弹窗3秒后自动关闭</li>
                                     </ul>
                                 </li>
@@ -3717,25 +3774,36 @@
                         <div class="prd-section-title">功能逻辑</div>
                         <div class="prd-section-content">
                             <ul>
-                                <li><strong>转盘界面：</strong>圆形转盘，根据奖品数量平均分割扇形区域（最多10个）</li>
-                                <li><strong>奖品展示：</strong>每个扇形区域显示奖品名称和图标，添加几个奖品就显示几个扇形</li>
+                                <li><strong>转盘界面：</strong>圆形转盘，根据当前剩余的奖品种类平均分割扇形区域（最多9种奖品类型，奖品总数最多30个）</li>
+                                <li><strong>奖品展示：</strong>每个扇形区域显示奖品名称和图标</li>
+                                <li><strong>奖品池机制：</strong>
+                                    <ul>
+                                        <li>根据每个奖品设置的数量生成奖品池（例如：奖品A×3，奖品B×5，奖品池共8个奖品）</li>
+                                        <li>每次抽奖从奖品池中随机抽取一个奖品</li>
+                                        <li>抽中后从奖品池中移除该奖品，剩余数量减1</li>
+                                        <li>当某种奖品数量为0时，该奖品不可再被抽中，但转盘保持原有样式不变</li>
+                                        <li>当所有奖品抽完后，提示"奖品已全部抽完！"</li>
+                                    </ul>
+                                </li>
                                 <li><strong>抽奖模式：</strong>
                                     <ul>
                                         <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
                                         <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击抽奖提示“请先选择学生后再抽奖”，选中学生可以直接点击抽奖。</li>
-                                        <li>学生名单显示在音乐按钮下方的左侧侧边栏，学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
+                                        <li>学生名单显示在音乐按钮下方的左侧侧边栏，侧边栏顶部显示"学生名单"标题和班级下拉框（支持按班级筛选），下方显示搜索框（支持按学生姓名模糊查询），学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
                                     </ul>
                                 </li>
                                 <li><strong>转动机制：</strong>
                                     <ul>
                                         <li>点击中心"抽奖"按钮开始转动</li>
-                                        <li>转盘旋转3秒后减速停止</li>
+                                        <li>转盘旋转4秒后减速停止</li>
                                         <li>指针指向的扇形区域为中奖奖品</li>
                                         <li>弹窗显示中奖结果：显示"恭喜中奖"和奖品名称</li>
                                         <li>弹窗3秒后自动关闭</li>
+                                        <li>已抽完的奖品不可再被抽中，但转盘样式保持不变</li>
                                     </ul>
                                 </li>
                                 <li><strong>防重复点击：</strong>转动过程中禁用抽奖按钮</li>
+                                <li><strong>音乐控制：</strong>左上角音乐开关按钮，控制背景音乐播放</li>
                                 <li><strong>抽奖记录：</strong>支持查看该活动的历史抽奖记录</li>
                             </ul>
                         </div>
@@ -3772,12 +3840,22 @@
                         <div class="prd-section-content">
                             <ul>
                                 <li><strong>游戏界面：</strong>3×3网格布局，中心为"开始抽奖"按钮，周围8个格子显示奖品</li>
-                                <li><strong>奖品展示：</strong>每个格子显示奖品图标和名称</li>
+                                <li><strong>奖品展示：</strong>每个格子显示奖品图标和名称，只显示当前还有剩余数量的奖品种类，不足9种的格子显示"谢谢参与"</li>
+                                <li><strong>奖品池机制：</strong>
+                                    <ul>
+                                        <li>最多添加9种奖品类型，奖品总数最多30个</li>
+                                        <li>根据每个奖品设置的数量生成奖品池（例如：奖品A×3，奖品B×5，奖品池共8个奖品）</li>
+                                        <li>每次抽奖从奖品池中随机抽取一个奖品</li>
+                                        <li>抽中后从奖品池中移除该奖品，剩余数量减1</li>
+                                        <li>当某种奖品数量为0时，九宫格自动更新，该奖品不再显示</li>
+                                        <li>当所有奖品抽完后，提示"奖品已全部抽完！"</li>
+                                    </ul>
+                                </li>
                                 <li><strong>抽奖模式：</strong>
                                     <ul>
                                         <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
                                         <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击开始抽奖提示“请先选择学生后再抽奖”，选中学生可以直接点击开始抽奖。</li>
-                                        <li>学生名单显示在音乐按钮下方的左侧侧边栏，学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
+                                        <li>学生名单显示在音乐按钮下方的左侧侧边栏，侧边栏顶部显示"学生名单"标题和班级下拉框（支持按班级筛选），下方显示搜索框（支持按学生姓名模糊查询），学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
                                     </ul>
                                 </li>
                                 <li><strong>跑马灯机制：</strong>
@@ -3787,9 +3865,11 @@
                                         <li>停止在随机选中的奖品格子上</li>
                                         <li>弹窗显示中奖结果：抽中奖品显示"恭喜中奖"和奖品名称，抽中"谢谢参与"显示"很遗憾，未抽中奖品"</li>
                                         <li>弹窗3秒后自动关闭</li>
+                                        <li>九宫格自动更新，移除已抽完的奖品种类</li>
                                     </ul>
                                 </li>
                                 <li><strong>防重复点击：</strong>抽奖过程中禁用开始按钮</li>
+                                <li><strong>音乐控制：</strong>左上角音乐开关按钮，控制背景音乐播放</li>
                                 <li><strong>抽奖记录：</strong>支持查看该活动的历史抽奖记录</li>
                             </ul>
                         </div>
@@ -3802,7 +3882,7 @@
                                 <li>专属抽奖模式：左侧显示学生名单（位于音乐按钮下方），点击选中学生后才能抽奖</li>
                                 <li>点击"开始抽奖"按钮：启动跑马灯抽奖</li>
                                 <li>抽奖过程：格子依次高亮，按钮禁用</li>
-                                <li>抽奖结束：中奖格子保持高亮，弹窗显示中奖结果，记录抽奖结果，3秒倒计时后自动关闭</li>
+                                <li>抽奖结束：中奖格子保持高亮，弹窗显示中奖结果，记录抽奖结果，九宫格自动更新，3秒倒计时后自动关闭</li>
                                 <li>点击弹窗"确定"按钮或弹窗外部区域：立即关闭弹窗</li>
                                 <li>点击抽奖记录按钮：查看该活动的历史抽奖记录</li>
                                 <li>点击音乐按钮：切换音乐播放状态</li>
@@ -4015,10 +4095,12 @@
                 
                 // 根据类型设置奖品信息提示语
                 const prizeHint = document.getElementById('prizeHint');
-                if (lottery.type === '幸运转盘') {
-                    prizeHint.textContent = '💡 最多添加10个奖品信息，系统将按实际添加数量显示';
+                if (lottery.type === '开心刮刮乐') {
+                    prizeHint.textContent = '💡 最多添加30个奖品';
+                } else if (lottery.type === '幸运转盘') {
+                    prizeHint.textContent = '💡 最多添加9种奖品类型，奖品总数最多30个';
                 } else {
-                    prizeHint.textContent = '💡 最多添加9个奖品信息，不足9个的为"谢谢参与"';
+                    prizeHint.textContent = '💡 最多添加9种奖品类型，奖品总数最多30个，不足9种的为"谢谢参与"';
                 }
                 
                 // 渲染奖品列表
@@ -4087,6 +4169,10 @@
                 document.getElementById('listPage').style.display = 'none';
                 document.getElementById('gamePage').classList.add('active');
                 
+                // 初始化班级选择器和学生列表
+                initClassSelector();
+                renderStudentList();
+                
                 // 根据类型显示不同的游戏
                 showGameByType(lottery.type);
             }
@@ -4134,10 +4220,29 @@
         function generateWheel() {
             const canvas = document.getElementById('wheelCanvas');
             const ctx = canvas.getContext('2d');
-            const prizes = currentLottery.prizes;
+            
+            // 初始化或获取当前活动的剩余奖品池
+            if (!currentLottery.remainingPrizes) {
+                // 根据奖品数量和每个奖品的数量生成剩余奖品池
+                currentLottery.remainingPrizes = [];
+                currentLottery.prizes.forEach(prize => {
+                    const prizeName = typeof prize === 'string' ? prize : prize.name;
+                    const prizeCount = typeof prize === 'string' ? 1 : prize.count;
+                    for (let i = 0; i < prizeCount; i++) {
+                        currentLottery.remainingPrizes.push(prizeName);
+                    }
+                });
+            }
+            
+            // 获取所有奖品种类（始终显示所有奖品，不管是否抽完）
+            const allPrizeTypes = currentLottery.prizes.map(prize => {
+                return typeof prize === 'string' ? prize : prize.name;
+            });
+            
+            const prizes = allPrizeTypes;
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const radius = 245; // 调整半径以适应500px的canvas
+            const radius = 245;
             const anglePerPrize = (Math.PI * 2) / prizes.length;
 
             // 清空画布
@@ -4154,7 +4259,7 @@
                 ctx.arc(centerX, centerY, radius, startAngle, endAngle);
                 ctx.closePath();
                 
-                // 填充颜色 - 使用橙色系渐变
+                // 填充颜色 - 所有奖品保持原样显示
                 const colors = [
                     ['#ffe0b2', '#ffcc80'],
                     ['#fff3e0', '#ffe0b2'],
@@ -4220,6 +4325,12 @@
         function spinWheel() {
             if (wheelSpinning) return;
             
+            // 检查是否还有剩余奖品
+            if (!currentLottery.remainingPrizes || currentLottery.remainingPrizes.length === 0) {
+                showToast('奖品已全部抽完！', 'warning');
+                return;
+            }
+            
             wheelSpinning = true;
             const btn = document.getElementById('wheelCenterBtn');
             const btnText = document.getElementById('btnText');
@@ -4229,11 +4340,19 @@
             btnText.textContent = '抽奖中...';
             
             const canvas = document.getElementById('wheelCanvas');
-            const prizes = currentLottery.prizes;
-            const anglePerPrize = 360 / prizes.length;
             
-            // 随机选择奖品
-            const winIndex = Math.floor(Math.random() * prizes.length);
+            // 获取所有奖品种类（用于转盘显示）
+            const allPrizeTypes = currentLottery.prizes.map(prize => {
+                return typeof prize === 'string' ? prize : prize.name;
+            });
+            const anglePerPrize = 360 / allPrizeTypes.length;
+            
+            // 从剩余奖品池中随机选择一个奖品
+            const randomIndex = Math.floor(Math.random() * currentLottery.remainingPrizes.length);
+            const wonPrize = currentLottery.remainingPrizes[randomIndex];
+            
+            // 找到该奖品在转盘上的位置
+            const winIndex = allPrizeTypes.indexOf(wonPrize);
             const targetAngle = 360 * 8 + (360 - winIndex * anglePerPrize - anglePerPrize / 2);
             
             let currentRotation = 0;
@@ -4258,9 +4377,14 @@
                     btn.classList.remove('loading');
                     btnText.textContent = '抽奖';
                     
-                    // 显示中奖结果
+                    // 从剩余奖品池中移除已抽中的奖品
+                    currentLottery.remainingPrizes.splice(randomIndex, 1);
+                    
+                    // 重新绘制转盘（已抽完的奖品会显示为灰色）
                     setTimeout(() => {
-                        showWheelResult(prizes[winIndex]);
+                        generateWheel();
+                        // 显示中奖结果
+                        showWheelResult(wonPrize);
                     }, 500);
                 }
             }
@@ -4279,16 +4403,10 @@
             const resultTitle = document.querySelector('#wheelResultModal .result-title');
             const resultPrize = document.getElementById('resultPrize');
             
-            // 判断是否为"谢谢参与"
-            if (prize === '谢谢参与') {
-                resultIcon.textContent = '😢';
-                resultTitle.textContent = '很遗憾';
-                resultPrize.textContent = '未抽中奖品';
-            } else {
-                resultIcon.textContent = '🎉';
-                resultTitle.textContent = '恭喜中奖';
-                resultPrize.textContent = prize;
-            }
+            // 幸运转盘不再有"谢谢参与"，所有奖品都是真实奖品
+            resultIcon.textContent = '🎉';
+            resultTitle.textContent = '恭喜中奖';
+            resultPrize.textContent = prize;
             
             // 记录抽奖结果
             recordLotteryResult(prize);
@@ -4403,13 +4521,34 @@
             const board = document.getElementById('gridBoard');
             board.innerHTML = '';
             
-            const prizes = currentLottery.prizes;
+            // 初始化或获取当前活动的剩余奖品池
+            if (!currentLottery.remainingGridPrizes) {
+                // 根据奖品数量和每个奖品的数量生成剩余奖品池
+                currentLottery.remainingGridPrizes = [];
+                currentLottery.prizes.forEach(prize => {
+                    const prizeName = typeof prize === 'string' ? prize : prize.name;
+                    const prizeCount = typeof prize === 'string' ? 1 : prize.count;
+                    for (let i = 0; i < prizeCount; i++) {
+                        currentLottery.remainingGridPrizes.push(prizeName);
+                    }
+                });
+            }
+            
+            // 获取当前可用的奖品种类（去重）
+            const availablePrizeTypes = [...new Set(currentLottery.remainingGridPrizes)];
+            
+            // 如果没有剩余奖品，显示提示
+            if (availablePrizeTypes.length === 0) {
+                board.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">奖品已全部抽完！</div>';
+                return;
+            }
+            
             const icons = ['🎁', '🎁', '🎁', '🎁', '🎁', '🎁', '🎁', '🎁', '🎁'];
             
-            // 创建奖品数组（9个位置）
+            // 创建奖品数组（9个位置），不足9种的填充"谢谢参与"
             const gridPrizes = [];
             for (let i = 0; i < 9; i++) {
-                gridPrizes.push(i < prizes.length ? prizes[i] : '谢谢参与');
+                gridPrizes.push(i < availablePrizeTypes.length ? availablePrizeTypes[i] : '谢谢参与');
             }
             
             // 存储到全局变量供startGrid使用
@@ -4433,6 +4572,12 @@
         function startGrid() {
             if (gridRunning) return;
             
+            // 检查是否还有剩余奖品
+            if (!currentLottery.remainingGridPrizes || currentLottery.remainingGridPrizes.length === 0) {
+                showToast('奖品已全部抽完！', 'warning');
+                return;
+            }
+            
             gridRunning = true;
             const btn = document.getElementById('gridStartBtn');
             btn.disabled = true;
@@ -4441,8 +4586,12 @@
             let count = 0;
             const maxCount = 30;
             
-            // 随机选择最终位置
-            const finalIndex = Math.floor(Math.random() * 9);
+            // 从剩余奖品池中随机选择一个奖品
+            const randomIndex = Math.floor(Math.random() * currentLottery.remainingGridPrizes.length);
+            const wonPrize = currentLottery.remainingGridPrizes[randomIndex];
+            
+            // 找到该奖品在九宫格上的位置
+            const finalIndex = window.currentGridPrizes.indexOf(wonPrize);
             
             gridTimer = setInterval(() => {
                 // 移除上一个高亮
@@ -4469,12 +4618,14 @@
                     gridRunning = false;
                     btn.disabled = false;
                     
-                    // 直接从存储的奖品数组中获取中奖奖品
-                    const winPrize = window.currentGridPrizes[finalIndex];
+                    // 从剩余奖品池中移除已抽中的奖品
+                    currentLottery.remainingGridPrizes.splice(randomIndex, 1);
                     
-                    // 使用与幸运转盘相同的弹窗显示结果
+                    // 重新生成九宫格（如果某种奖品已抽完，九宫格会自动更新）
                     setTimeout(() => {
-                        showWheelResult(winPrize);
+                        generateGrid();
+                        // 使用与幸运转盘相同的弹窗显示结果
+                        showWheelResult(wonPrize);
                     }, 500);
                 }
             }, speed);
@@ -4795,15 +4946,39 @@
             const container = document.getElementById('studentList');
             container.innerHTML = '';
             
-            // 统计已抽奖学生数
-            const drawnCount = students.filter(s => {
+            // 获取当前选择的班级和搜索关键词
+            const selectedClass = document.getElementById('classSelector')?.value || '';
+            const searchKeyword = document.getElementById('studentSearchInput')?.value.toLowerCase().trim() || '';
+            
+            // 过滤学生列表
+            let filteredStudents = students;
+            
+            // 按班级过滤
+            if (selectedClass) {
+                filteredStudents = filteredStudents.filter(s => s.class === selectedClass);
+            }
+            
+            // 按姓名搜索（模糊查询）
+            if (searchKeyword) {
+                filteredStudents = filteredStudents.filter(s => 
+                    s.name.toLowerCase().includes(searchKeyword)
+                );
+            }
+            
+            // 统计已抽奖学生数（基于过滤后的学生）
+            const drawnCount = filteredStudents.filter(s => {
                 return lotteryRecords.some(r => r.studentId === s.id && r.lotteryId === currentLottery.id);
             }).length;
             
-            document.getElementById('totalStudents').textContent = students.length;
+            document.getElementById('totalStudents').textContent = filteredStudents.length;
             document.getElementById('drawnStudents').textContent = drawnCount;
             
-            students.forEach(student => {
+            if (filteredStudents.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px; color: #999;">未找到匹配的学生</div>';
+                return;
+            }
+            
+            filteredStudents.forEach(student => {
                 // 查找该学生在当前活动中的抽奖记录
                 const record = lotteryRecords.find(r => 
                     r.studentId === student.id && r.lotteryId === currentLottery.id
@@ -4828,6 +5003,36 @@
             });
         }
 
+        // 初始化班级下拉框
+        function initClassSelector() {
+            const classSelector = document.getElementById('classSelector');
+            if (!classSelector) return;
+            
+            // 获取所有不重复的班级
+            const classes = [...new Set(students.map(s => s.class).filter(c => c))];
+            
+            // 清空现有选项（保留"全部班级"）
+            classSelector.innerHTML = '<option value="">九年级1班</option>';
+            
+            // 添加班级选项
+            classes.sort().forEach(className => {
+                const option = document.createElement('option');
+                option.value = className;
+                option.textContent = className;
+                classSelector.appendChild(option);
+            });
+        }
+
+        // 按班级过滤学生
+        function filterStudentsByClass() {
+            renderStudentList();
+        }
+
+        // 搜索学生
+        function searchStudents() {
+            renderStudentList();
+        }
+
         // 选择学生
         function selectStudent(student) {
             if (lotteryMode !== 'exclusive') return;
@@ -4844,7 +5049,7 @@
                 lotteryTitle: currentLottery.title,
                 lotteryType: currentLottery.type,
                 studentId: lotteryMode === 'exclusive' && selectedStudent ? selectedStudent.id : null,
-                studentName: lotteryMode === 'exclusive' && selectedStudent ? selectedStudent.name : '口头指定',
+                studentName: lotteryMode === 'exclusive' && selectedStudent ? selectedStudent.name : '幸运抽奖',
                 prize: prize,
                 mode: lotteryMode,
                 time: new Date().toLocaleString('zh-CN', { 
@@ -4911,25 +5116,48 @@
             grid.innerHTML = '';
 
             const prizes = currentLottery.prizes;
-            const cards = 9;
             
-            // 随机分配奖品
+            // 根据奖品数量和每个奖品的数量生成卡片奖品列表
             const cardPrizes = [];
-            for (let i = 0; i < cards; i++) {
-                if (i < prizes.length) {
-                    cardPrizes.push(prizes[i]);
-                } else {
-                    cardPrizes.push('谢谢参与');
+            prizes.forEach(prize => {
+                const prizeName = typeof prize === 'string' ? prize : prize.name;
+                const prizeCount = typeof prize === 'string' ? 1 : prize.count;
+                for (let i = 0; i < prizeCount; i++) {
+                    cardPrizes.push(prizeName);
                 }
-            }
+            });
             
             // 打乱顺序
             cardPrizes.sort(() => Math.random() - 0.5);
+            
+            const totalCards = cardPrizes.length;
 
-            for (let i = 0; i < cards; i++) {
+            // 动态计算卡片大小和网格布局
+            const container = document.getElementById('scratchGameContainer');
+            const containerWidth = container.clientWidth - 40; // 减去padding
+            const containerHeight = container.clientHeight - 40; // 减去padding
+            
+            // 计算最佳的行列数
+            let cols = Math.ceil(Math.sqrt(totalCards));
+            let rows = Math.ceil(totalCards / cols);
+            
+            // 根据容器大小计算卡片尺寸
+            const maxCardWidth = (containerWidth - (cols - 1) * 15) / cols; // 15px是gap
+            const maxCardHeight = (containerHeight - (rows - 1) * 15) / rows;
+            const cardSize = Math.min(maxCardWidth, maxCardHeight, 250); // 最大250px
+            
+            // 设置网格样式
+            grid.style.gridTemplateColumns = `repeat(${cols}, ${cardSize}px)`;
+            grid.style.gap = '15px';
+            grid.style.width = 'auto';
+            grid.style.height = 'auto';
+
+            for (let i = 0; i < totalCards; i++) {
                 const card = document.createElement('div');
                 card.className = 'scratch-card';
                 card.id = `scratch-card-${i}`;
+                card.style.width = `${cardSize}px`;
+                card.style.height = `${cardSize}px`;
                 
                 card.innerHTML = `
                     <div class="scratch-card-content">${cardPrizes[i]}</div>
@@ -4941,7 +5169,7 @@
             
             // 等待DOM渲染完成后初始化所有刮刮卡
             setTimeout(() => {
-                for (let i = 0; i < cards; i++) {
+                for (let i = 0; i < totalCards; i++) {
                     initScratchCard(i);
                 }
             }, 100);
@@ -5128,23 +5356,46 @@
             
             // 根据类型更新奖品信息提示语
             const prizeHint = document.getElementById('prizeHint');
-            if (selectedLotteryType === '幸运转盘') {
-                prizeHint.textContent = '💡 最多添加10个奖品信息，系统将按实际添加数量显示';
+            if (selectedLotteryType === '开心刮刮乐') {
+                prizeHint.textContent = '💡 最多添加30个奖品';
+            } else if (selectedLotteryType === '幸运转盘') {
+                prizeHint.textContent = '💡 最多添加9种奖品类型，奖品总数最多30个';
             } else {
-                prizeHint.textContent = '💡 最多添加9个奖品信息，不足9个的为"谢谢参与"';
+                prizeHint.textContent = '💡 最多添加9种奖品类型，奖品总数最多30个，不足9种的为"谢谢参与"';
             }
             
             // 更新添加奖品按钮状态
             const addBtn = document.getElementById('addPrizeBtn');
             if (addBtn) {
-                const maxPrizes = selectedLotteryType === '幸运转盘' ? 10 : 9;
+                const maxPrizes = selectedLotteryType === '开心刮刮乐' ? 30 : (selectedLotteryType === '幸运转盘' ? 30 : 30);
+                const maxTypes = selectedLotteryType === '九宫格' ? 9 : (selectedLotteryType === '幸运转盘' ? 9 : Infinity);
                 
-                if (prizeList.length >= maxPrizes) {
-                    addBtn.disabled = true;
-                    addBtn.textContent = `+ 添加奖品（已达上限${maxPrizes}个）`;
+                // 计算奖品总数量（所有奖品的count总和）
+                const totalPrizeCount = prizeList.reduce((sum, prize) => {
+                    const count = typeof prize === 'string' ? 1 : prize.count;
+                    return sum + count;
+                }, 0);
+                
+                // 九宫格和幸运转盘需要同时检查类型数量和总数量
+                if (selectedLotteryType === '九宫格' || selectedLotteryType === '幸运转盘') {
+                    if (prizeList.length >= maxTypes) {
+                        addBtn.disabled = true;
+                        addBtn.textContent = `+ 添加奖品（已达类型上限${maxTypes}种）`;
+                    } else if (totalPrizeCount >= maxPrizes) {
+                        addBtn.disabled = true;
+                        addBtn.textContent = `+ 添加奖品（已达数量上限${maxPrizes}个）`;
+                    } else {
+                        addBtn.disabled = false;
+                        addBtn.textContent = `+ 添加奖品（${prizeList.length}种/${totalPrizeCount}个）`;
+                    }
                 } else {
-                    addBtn.disabled = false;
-                    addBtn.textContent = `+ 添加奖品（${prizeList.length}/${maxPrizes}）`;
+                    if (totalPrizeCount >= maxPrizes) {
+                        addBtn.disabled = true;
+                        addBtn.textContent = `+ 添加奖品（已达上限${maxPrizes}个）`;
+                    } else {
+                        addBtn.disabled = false;
+                        addBtn.textContent = `+ 添加奖品（${totalPrizeCount}/${maxPrizes}）`;
+                    }
                 }
             }
         }
@@ -5161,16 +5412,34 @@
                 prizeList.forEach((prize, index) => {
                     console.log(`处理奖品 ${index}:`, prize, '是否编辑中:', editingPrizeIndex === index);
                     if (editingPrizeIndex === index) {
-                        // 编辑模式：显示输入框
+                        // 编辑模式：显示输入框（名称和数量）
                         const inputWrapper = document.createElement('div');
                         inputWrapper.className = 'prize-input-wrapper';
+                        inputWrapper.style.display = 'flex';
+                        inputWrapper.style.gap = '10px';
+                        inputWrapper.style.alignItems = 'center';
+                        
+                        const prizeName = typeof prize === 'string' ? prize : prize.name;
+                        const prizeCount = typeof prize === 'string' ? 1 : prize.count;
+                        
                         inputWrapper.innerHTML = `
                             <input 
                                 type="text" 
                                 class="prize-input" 
-                                id="prizeInput-${index}"
-                                value="${prize}" 
+                                id="prizeNameInput-${index}"
+                                value="${prizeName}" 
                                 placeholder="请输入奖品名称"
+                                style="flex: 1;"
+                                onkeypress="if(event.key==='Enter') confirmEditPrize(${index})"
+                            />
+                            <input 
+                                type="number" 
+                                class="prize-input" 
+                                id="prizeCountInput-${index}"
+                                value="${prizeCount}" 
+                                placeholder="数量"
+                                min="1"
+                                style="width: 80px;"
                                 onkeypress="if(event.key==='Enter') confirmEditPrize(${index})"
                             />
                         `;
@@ -5178,7 +5447,7 @@
                         
                         // 自动聚焦并选中文本
                         setTimeout(() => {
-                            const input = document.getElementById(`prizeInput-${index}`);
+                            const input = document.getElementById(`prizeNameInput-${index}`);
                             console.log('尝试聚焦输入框:', input);
                             if (input) {
                                 input.focus();
@@ -5189,8 +5458,12 @@
                         // 显示模式：显示标签
                         const tag = document.createElement('div');
                         tag.className = 'prize-tag';
+                        
+                        const prizeName = typeof prize === 'string' ? prize : prize.name;
+                        const prizeCount = typeof prize === 'string' ? 1 : prize.count;
+                        
                         tag.innerHTML = `
-                            <span class="prize-tag-text">${prize}</span>
+                            <span class="prize-tag-text">${prizeName} × ${prizeCount}</span>
                             <div class="prize-tag-actions">
                                 <button class="prize-tag-btn" onclick="startEditPrize(${index})" title="编辑">✏️</button>
                                 <button class="prize-tag-btn" onclick="showDeletePrizeConfirm(${index})" title="删除">🗑️</button>
@@ -5204,12 +5477,26 @@
                 if (isAddingPrize) {
                     const inputWrapper = document.createElement('div');
                     inputWrapper.className = 'prize-input-wrapper';
+                    inputWrapper.style.display = 'flex';
+                    inputWrapper.style.gap = '10px';
+                    inputWrapper.style.alignItems = 'center';
                     inputWrapper.innerHTML = `
                         <input 
                             type="text" 
                             class="prize-input" 
-                            id="newPrizeInput"
+                            id="newPrizeNameInput"
                             placeholder="请输入奖品名称" 
+                            style="flex: 1;"
+                            onkeypress="if(event.key==='Enter') confirmAddPrize()"
+                        />
+                        <input 
+                            type="number" 
+                            class="prize-input" 
+                            id="newPrizeCountInput"
+                            placeholder="数量"
+                            value="1"
+                            min="1"
+                            style="width: 80px;"
                             onkeypress="if(event.key==='Enter') confirmAddPrize()"
                         />
                     `;
@@ -5217,7 +5504,7 @@
                     
                     // 自动聚焦
                     setTimeout(() => {
-                        const input = document.getElementById('newPrizeInput');
+                        const input = document.getElementById('newPrizeNameInput');
                         if (input) {
                             input.focus();
                         }
@@ -5228,15 +5515,35 @@
             // 更新添加按钮状态
             const addBtn = document.getElementById('addPrizeBtn');
             if (addBtn) {
-                // 根据抽奖类型设置不同的上限
-                const maxPrizes = selectedLotteryType === '幸运转盘' ? 10 : 9;
+                const maxPrizes = selectedLotteryType === '开心刮刮乐' ? 30 : (selectedLotteryType === '幸运转盘' ? 30 : 30);
+                const maxTypes = selectedLotteryType === '九宫格' ? 9 : (selectedLotteryType === '幸运转盘' ? 9 : Infinity);
                 
-                if (prizeList.length >= maxPrizes) {
-                    addBtn.disabled = true;
-                    addBtn.textContent = `+ 添加奖品（已达上限${maxPrizes}个）`;
+                // 计算奖品总数量（所有奖品的count总和）
+                const totalPrizeCount = prizeList.reduce((sum, prize) => {
+                    const count = typeof prize === 'string' ? 1 : prize.count;
+                    return sum + count;
+                }, 0);
+                
+                // 九宫格和幸运转盘需要同时检查类型数量和总数量
+                if (selectedLotteryType === '九宫格' || selectedLotteryType === '幸运转盘') {
+                    if (prizeList.length >= maxTypes) {
+                        addBtn.disabled = true;
+                        addBtn.textContent = `+ 添加奖品（已达类型上限${maxTypes}种）`;
+                    } else if (totalPrizeCount >= maxPrizes) {
+                        addBtn.disabled = true;
+                        addBtn.textContent = `+ 添加奖品（已达数量上限${maxPrizes}个）`;
+                    } else {
+                        addBtn.disabled = false;
+                        addBtn.textContent = `+ 添加奖品（${prizeList.length}种/${totalPrizeCount}个）`;
+                    }
                 } else {
-                    addBtn.disabled = false;
-                    addBtn.textContent = `+ 添加奖品（${prizeList.length}/${maxPrizes}）`;
+                    if (totalPrizeCount >= maxPrizes) {
+                        addBtn.disabled = true;
+                        addBtn.textContent = `+ 添加奖品（已达上限${maxPrizes}个）`;
+                    } else {
+                        addBtn.disabled = false;
+                        addBtn.textContent = `+ 添加奖品（${totalPrizeCount}/${maxPrizes}）`;
+                    }
                 }
             }
         }
@@ -5248,30 +5555,71 @@
             }
             
             // 根据抽奖类型设置不同的数量限制
-            const maxPrizes = selectedLotteryType === '幸运转盘' ? 10 : 9;
-            if (prizeList.length >= maxPrizes) {
-                alert(`最多只能添加${maxPrizes}个奖品！`);
-                return;
+            const maxPrizes = selectedLotteryType === '开心刮刮乐' ? 30 : (selectedLotteryType === '幸运转盘' ? 30 : 30);
+            const maxTypes = selectedLotteryType === '九宫格' ? 9 : (selectedLotteryType === '幸运转盘' ? 9 : Infinity);
+            
+            // 计算奖品总数量（所有奖品的count总和）
+            const totalPrizeCount = prizeList.reduce((sum, prize) => {
+                const count = typeof prize === 'string' ? 1 : prize.count;
+                return sum + count;
+            }, 0);
+            
+            // 九宫格和幸运转盘需要同时检查类型数量和总数量
+            if (selectedLotteryType === '九宫格' || selectedLotteryType === '幸运转盘') {
+                if (prizeList.length >= maxTypes) {
+                    alert(`最多只能添加${maxTypes}种奖品类型！`);
+                    return;
+                }
+                if (totalPrizeCount >= maxPrizes) {
+                    alert(`最多只能添加${maxPrizes}个奖品！`);
+                    return;
+                }
+            } else {
+                if (totalPrizeCount >= maxPrizes) {
+                    alert(`最多只能添加${maxPrizes}个奖品！`);
+                    return;
+                }
             }
+            
             isAddingPrize = true;
             renderPrizeList();
         }
 
         // 确认添加新奖品
         function confirmAddPrize() {
-            const input = document.getElementById('newPrizeInput');
-            if (input) {
-                const prizeName = input.value.trim();
-                if (prizeName) {
+            const nameInput = document.getElementById('newPrizeNameInput');
+            const countInput = document.getElementById('newPrizeCountInput');
+            if (nameInput && countInput) {
+                const prizeName = nameInput.value.trim();
+                const prizeCount = parseInt(countInput.value) || 1;
+                if (prizeName && prizeCount > 0) {
                     // 根据抽奖类型设置不同的数量限制
-                    const maxPrizes = selectedLotteryType === '幸运转盘' ? 10 : 9;
-                    if (prizeList.length >= maxPrizes) {
-                        alert(`最多只能添加${maxPrizes}个奖品！`);
+                    const maxPrizes = selectedLotteryType === '开心刮刮乐' ? 30 : (selectedLotteryType === '幸运转盘' ? 30 : 30);
+                    const maxTypes = selectedLotteryType === '九宫格' ? 9 : (selectedLotteryType === '幸运转盘' ? 9 : Infinity);
+                    
+                    // 计算当前奖品总数量
+                    const currentTotalCount = prizeList.reduce((sum, prize) => {
+                        const count = typeof prize === 'string' ? 1 : prize.count;
+                        return sum + count;
+                    }, 0);
+                    
+                    // 检查添加后是否超过上限
+                    if (currentTotalCount + prizeCount > maxPrizes) {
+                        alert(`添加后将超过上限${maxPrizes}个奖品！当前已有${currentTotalCount}个，最多还能添加${maxPrizes - currentTotalCount}个。`);
                         isAddingPrize = false;
                         renderPrizeList();
                         return;
                     }
-                    prizeList.push(prizeName);
+                    
+                    // 九宫格和幸运转盘检查奖品类型数量
+                    if ((selectedLotteryType === '九宫格' || selectedLotteryType === '幸运转盘') && prizeList.length >= maxTypes) {
+                        alert(`最多只能添加${maxTypes}种奖品类型！`);
+                        isAddingPrize = false;
+                        renderPrizeList();
+                        return;
+                    }
+                    
+                    prizeList.push({ name: prizeName, count: prizeCount });
                 }
                 isAddingPrize = false;
                 renderPrizeList();
@@ -5299,13 +5647,33 @@
         // 确认编辑奖品
         function confirmEditPrize(index) {
             console.log('确认编辑奖品:', index);
-            const input = document.getElementById(`prizeInput-${index}`);
-            console.log('找到输入框:', input);
-            if (input) {
-                const newName = input.value.trim();
-                console.log('新名称:', newName, '原名称:', prizeList[index]);
-                if (newName) {
-                    prizeList[index] = newName;
+            const nameInput = document.getElementById(`prizeNameInput-${index}`);
+            const countInput = document.getElementById(`prizeCountInput-${index}`);
+            console.log('找到输入框:', nameInput, countInput);
+            if (nameInput && countInput) {
+                const newName = nameInput.value.trim();
+                const newCount = parseInt(countInput.value) || 1;
+                console.log('新名称:', newName, '新数量:', newCount, '原数据:', prizeList[index]);
+                if (newName && newCount > 0) {
+                    // 根据抽奖类型设置不同的数量限制
+                    const maxPrizes = selectedLotteryType === '开心刮刮乐' ? 30 : (selectedLotteryType === '幸运转盘' ? 30 : 30);
+                    
+                    // 计算除当前编辑项外的其他奖品总数量
+                    const otherPrizesCount = prizeList.reduce((sum, prize, i) => {
+                        if (i === index) return sum; // 跳过当前编辑的奖品
+                        const count = typeof prize === 'string' ? 1 : prize.count;
+                        return sum + count;
+                    }, 0);
+                    
+                    // 检查编辑后是否超过上限
+                    if (otherPrizesCount + newCount > maxPrizes) {
+                        alert(`修改后将超过上限${maxPrizes}个奖品！其他奖品共${otherPrizesCount}个，此奖品最多设置${maxPrizes - otherPrizesCount}个。`);
+                        editingPrizeIndex = -1;
+                        renderPrizeList();
+                        return;
+                    }
+                    
+                    prizeList[index] = { name: newName, count: newCount };
                 }
                 editingPrizeIndex = -1;
                 renderPrizeList();
@@ -5321,8 +5689,10 @@
         // 显示删除奖品确认弹窗
         function showDeletePrizeConfirm(index) {
             deletingPrizeIndex = index;
+            const prize = prizeList[index];
+            const prizeName = typeof prize === 'string' ? prize : prize.name;
             document.getElementById('deletePrizeMessage').textContent = 
-                `确定要删除"${prizeList[index]}"吗？`;
+                `确定要删除"${prizeName}"吗？`;
             document.getElementById('deletePrizeModal').classList.add('active');
         }
 
@@ -5362,7 +5732,11 @@
             // 重置为创建模式
             editingLotteryId = null;
             selectedLotteryType = '开心刮刮乐';
-            prizeList = ['奖励书一本', '奖励铅笔一支', '奖励礼品一份'];
+            prizeList = [
+                { name: '奖励书一本', count: 3 },
+                { name: '奖励铅笔一支', count: 5 },
+                { name: '奖励礼品一份', count: 2 }
+            ];
             
             document.getElementById('lotteryTitle').value = '';
             document.getElementById('modalTitle').textContent = '创建抽奖活动';
@@ -5383,7 +5757,7 @@
             
             // 设置默认提示语（开心刮刮乐）
             const prizeHint = document.getElementById('prizeHint');
-            prizeHint.textContent = '💡 最多添加9个奖品信息，不足9个的为"谢谢参与"';
+            prizeHint.textContent = '💡 最多添加30个奖品';
             
             renderPrizeList();
             document.getElementById('createModal').classList.add('active');
@@ -5880,9 +6254,9 @@
                         <li>基本信息：抽奖标题（必填，不超过20个字）、抽奖类型（开心刮刮乐/幸运转盘/九宫格）</li>
                         <li>奖品配置：
                             <ul>
-                                <li>开心刮刮乐/九宫格：最多添加9个奖品，不足9个的为"谢谢参与"</li>
-                                <li>幸运转盘：最多添加10个奖品，系统将按实际添加数量显示</li>
-                                <li>每个奖品包含：奖品名称和一个统一用的奖品图标</li>
+                                <li>开心刮刮乐：最多添加30个奖品，每个奖品包含奖品名称和数量</li>
+                                <li>幸运转盘：最多添加9种奖品类型，奖品总数最多30个，每个奖品包含奖品名称和数量</li>
+                                <li>九宫格：最多添加9种奖品类型，奖品总数最多30个，每个奖品包含奖品名称和数量，不足9种的为"谢谢参与"</li>
                             </ul>
                         </li>
                         <li>数据验证：标题不能为空，不超过20个字；至少添加1个奖品，奖品字数不超过50字</li>
@@ -5890,8 +6264,9 @@
                     <p><strong>交互逻辑：</strong></p>
                     <ul>
                         <li>选择抽奖类型后，显示对应的类型卡片高亮效果，并更新奖品配置提示语</li>
-                        <li>点击"添加奖品"按钮，新增奖品输入框</li>
-                        <li>点击奖品右侧"×"按钮，删除该奖品</li>
+                        <li>点击"添加奖品"按钮，新增奖品输入框（开心刮刮乐和幸运转盘显示名称和数量两个输入框）</li>
+                        <li>点击奖品右侧"✏️"按钮，编辑该奖品</li>
+                        <li>点击奖品右侧"🗑️"按钮，删除该奖品</li>
                         <li>点击"确定"按钮，保存活动并显示成功提示（顶部Toast）</li>
                         <li>点击"取消"或"×"按钮，关闭弹窗</li>
                     </ul>
@@ -5902,20 +6277,20 @@
                     <p><strong>功能描述：</strong>刮刮乐抽奖游戏，用户通过刮开卡片涂层查看中奖结果。支持幸运抽奖和专属抽奖两种模式。</p>
                     <p><strong>功能逻辑：</strong></p>
                     <ul>
-                        <li>游戏界面：3×3网格布局，共9张刮刮卡</li>
-                        <li>奖品分配：随机将配置的奖品分配到9张卡片中</li>
+                        <li>游戏界面：根据奖品总数量自适应显示刮刮卡（最多30张），刮刮卡在页面中居中显示，当数量较多时自动缩小卡片尺寸以确保全部显示在页面中，无需滚动条</li>
+                        <li>奖品分配：根据每个奖品设置的数量生成对应数量的刮刮卡，随机打乱顺序显示</li>
                         <li>抽奖模式：
                             <ul>
                                 <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
                                 <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击或在刮奖区域按下提示“请先选择学生后再抽奖”，选中学生可以直接刮奖。</li>
-                                <li>学生名单显示在音乐按钮下方的左侧侧边栏，学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
+                                <li>学生名单显示在音乐按钮下方的左侧侧边栏，侧边栏顶部显示"学生名单"标题和班级下拉框（支持按班级筛选），下方显示搜索框（支持按学生姓名模糊查询），学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
                             </ul>
                         </li>
                         <li>刮奖机制：
                             <ul>
                                 <li>鼠标/手指按下开始刮奖，移动鼠标/手指刮开涂层</li>
                                 <li>刮开面积达到10%时自动显示完整奖品</li>
-                                <li>弹窗显示中奖结果：抽中奖品显示"恭喜中奖"和奖品名称，抽中"谢谢参与"显示"很遗憾，未抽中奖品"</li>
+                                <li>弹窗显示中奖结果：抽中奖品显示"恭喜中奖"和奖品名称</li>
                                 <li>弹窗3秒后自动关闭</li>
                             </ul>
                         </li>
@@ -5939,25 +6314,36 @@
                         <h3>2.5 幸运转盘游戏（功能点 #5）</h3>
                     <p><strong>功能描述：</strong>转盘抽奖游戏，用户点击“抽奖”按钮转动转盘，指针停止位置为中奖结果。</p>
                     <ul>
-                        <li>转盘界面：圆形转盘，根据奖品数量平均分割扇形区域（最多10个）</li>
-                        <li>奖品展示：每个扇形区域显示奖品名称和图标，添加几个奖品就显示几个扇形</li>
+                        <li>转盘界面：圆形转盘，根据当前剩余的奖品种类平均分割扇形区域（最多9种奖品类型，奖品总数最多30个）</li>
+                        <li>奖品展示：每个扇形区域显示奖品名称和图标</li>
+                        <li>奖品池机制：
+                            <ul>
+                                <li>根据每个奖品设置的数量生成奖品池（例如：奖品A×3，奖品B×5，奖品池共8个奖品）</li>
+                                <li>每次抽奖从奖品池中随机抽取一个奖品</li>
+                                <li>抽中后从奖品池中移除该奖品，剩余数量减1</li>
+                                <li>当某种奖品数量为0时，该奖品不可再被抽中，但转盘保持原有样式不变</li>
+                                <li>当所有奖品抽完后，提示"奖品已全部抽完！"</li>
+                            </ul>
+                        </li>
                         <li>抽奖模式：
                             <ul>
                                 <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
                                 <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击抽奖提示“请先选择学生后再抽奖”，选中学生可以直接点击抽奖。</li>
-                                <li>学生名单显示在音乐按钮下方的左侧侧边栏，学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
+                                <li>学生名单显示在音乐按钮下方的左侧侧边栏，侧边栏顶部显示"学生名单"标题和班级下拉框（支持按班级筛选），下方显示搜索框（支持按学生姓名模糊查询），学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
                             </ul>
                         </li>
                         <li>转动机制：
                             <ul>
                                 <li>点击中心"抽奖"按钮开始转动</li>
-                                <li>转盘旋转3秒后减速停止</li>
+                                <li>转盘旋转4秒后减速停止</li>
                                 <li>指针指向的扇形区域为中奖奖品</li>
-                                <li>弹窗显示中奖结果：抽中奖品显示"恭喜中奖"和奖品名称，抽中"谢谢参与"显示"很遗憾，未抽中奖品"</li>
+                                <li>弹窗显示中奖结果：显示"恭喜中奖"和奖品名称</li>
                                 <li>弹窗3秒后自动关闭</li>
+                                <li>已抽完的奖品不可再被抽中，但转盘样式保持不变</li>
                             </ul>
                         </li>
                         <li>防重复点击：转动过程中禁用抽奖按钮</li>
+                        <li>音乐控制：左上角音乐开关按钮，控制背景音乐播放</li>
                         <li>抽奖记录：支持查看该活动的历史抽奖记录，且抽奖记录按抽奖时间倒序排序，刷新或者下次进入历史抽奖记录依然存在</li>
                     </ul>
                     <p><strong>交互逻辑：</strong></p>
@@ -5980,12 +6366,22 @@
                     <p><strong>功能逻辑：</strong></p>
                     <ul>
                         <li>游戏界面：3×3网格布局，中心为"开始抽奖"按钮，周围8个格子显示奖品</li>
-                        <li>奖品展示：每个格子显示奖品图标和名称</li>
+                        <li>奖品展示：每个格子显示奖品图标和名称，只显示当前还有剩余数量的奖品种类，不足9种的格子显示"谢谢参与"</li>
+                        <li>奖品池机制：
+                            <ul>
+                                <li>最多添加9种奖品类型，奖品总数最多30个</li>
+                                <li>根据每个奖品设置的数量生成奖品池（例如：奖品A×3，奖品B×5，奖品池共8个奖品）</li>
+                                <li>每次抽奖从奖品池中随机抽取一个奖品</li>
+                                <li>抽中后从奖品池中移除该奖品，剩余数量减1</li>
+                                <li>当某种奖品数量为0时，九宫格自动更新，该奖品不再显示</li>
+                                <li>当所有奖品抽完后，提示"奖品已全部抽完！"</li>
+                            </ul>
+                        </li>
                         <li>抽奖模式：
                             <ul>
                                 <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
                                 <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击开始抽奖提示“请先选择学生后再抽奖”，选中学生可以直接点击开始抽奖。</li>
-                                <li>学生名单显示在音乐按钮下方的左侧侧边栏，学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
+                                <li>学生名单显示在音乐按钮下方的左侧侧边栏，侧边栏顶部显示"学生名单"标题和班级下拉框（支持按班级筛选），下方显示搜索框（支持按学生姓名模糊查询），学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
                             </ul>
                         </li>
                         <li>跑马灯机制：
@@ -5995,9 +6391,11 @@
                                 <li>停止在随机选中的奖品格子上</li>
                                 <li>弹窗显示中奖结果：抽中奖品显示"恭喜中奖"和奖品名称，抽中"谢谢参与"显示"很遗憾，未抽中奖品"</li>
                                 <li>弹窗3秒后自动关闭</li>
+                                <li>九宫格自动更新，移除已抽完的奖品种类</li>
                             </ul>
                         </li>
                         <li>防重复点击：抽奖过程中禁用开始按钮</li>
+                        <li>音乐控制：左上角音乐开关按钮，控制背景音乐播放</li>
                         <li>抽奖记录：支持查看该活动的历史抽奖记录，且抽奖记录按抽奖时间倒序排序，刷新或者下次进入历史抽奖记录依然存在</li>
                     </ul>
                     <p><strong>交互逻辑：</strong></p>
@@ -6006,7 +6404,7 @@
                         <li>专属抽奖模式：左侧显示学生名单（位于音乐按钮下方），点击选中学生后才能抽奖</li>
                         <li>点击"开始抽奖"按钮：启动跑马灯抽奖</li>
                         <li>抽奖过程：格子依次高亮，按钮禁用</li>
-                        <li>抽奖结束：中奖格子保持高亮，弹窗显示中奖结果，记录抽奖结果，3秒倒计时后自动关闭</li>
+                        <li>抽奖结束：中奖格子保持高亮，弹窗显示中奖结果，记录抽奖结果，九宫格自动更新，3秒倒计时后自动关闭</li>
                         <li>点击弹窗"确定"按钮或弹窗外部区域：立即关闭弹窗</li>
                         <li>点击抽奖记录按钮：查看该活动的历史抽奖记录</li>
                         <li>点击音乐按钮：切换音乐播放状态</li>

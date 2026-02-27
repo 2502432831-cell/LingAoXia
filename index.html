@@ -3625,7 +3625,7 @@
                 <div class="form-group">
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
                         <label class="form-label required">奖品信息：</label>
-                        <span id="prizeHint" style="color: #999; font-size: 12px;">💡 最多添加50个奖品</span>
+                        <span id="prizeHint" style="color: #999; font-size: 12px;">💡 最多可添加 50 个奖品。设置完成后，点击空白处或按 Enter 键保存。</span>
                     </div>
                     <div class="prize-tags" id="prizeTags">
                         <!-- 奖品标签将动态生成 -->
@@ -4479,7 +4479,7 @@
                 // 根据类型设置奖品信息提示语
                 const prizeHint = document.getElementById('prizeHint');
                 if (lottery.type === '开心刮刮乐') {
-                    prizeHint.textContent = '💡 最多添加50个奖品';
+                    prizeHint.textContent = '💡 最多可添加 50 个奖品。设置完成后，点击空白处或按 Enter 键保存。';
                 } else if (lottery.type === '幸运转盘') {
                     prizeHint.textContent = '💡 最多添加9种奖品类型，奖品总数最多50个';
                 } else {
@@ -6334,7 +6334,7 @@
             // 根据类型更新奖品信息提示语
             const prizeHint = document.getElementById('prizeHint');
             if (selectedLotteryType === '开心刮刮乐') {
-                prizeHint.textContent = '💡 最多添加50个奖品';
+                prizeHint.textContent = '💡 最多可添加 50 个奖品。设置完成后，点击空白处或按 Enter 键保存。';
             } else if (selectedLotteryType === '幸运转盘') {
                 prizeHint.textContent = '💡 最多添加9种奖品类型，奖品总数最多50个';
             } else {
@@ -6741,7 +6741,7 @@
             
             // 设置默认提示语（开心刮刮乐）
             const prizeHint = document.getElementById('prizeHint');
-            prizeHint.textContent = '💡 最多添加50个奖品';
+            prizeHint.textContent = '💡 最多可添加 50 个奖品。设置完成后，点击空白处或按 Enter 键保存。';
             
             renderPrizeList();
             document.getElementById('createModal').classList.add('active');

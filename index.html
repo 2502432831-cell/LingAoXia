@@ -1043,6 +1043,38 @@
             color: #ff69b4;
             font-weight: bold;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .mode-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 20px;
+            color: white;
+            text-shadow: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .mode-badge.verbal {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .mode-badge.individual {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .mode-badge.group {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .mode-badge.class {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
         }
 
         .close-game-btn {
@@ -4842,9 +4874,22 @@
                 '幸运转盘': '幸运转盘',
                 '九宫格': '九宫格抽奖'
             };
+
+            const modeNames = {
+                'verbal': '幸运抽奖',
+                'individual': '单人抽奖',
+                'group': '小组抽奖',
+                'class': '全班抽奖'
+            };
             
             const gameTitle = document.getElementById('gameTitle');
-            gameTitle.textContent = titles[type] || '抽奖游戏';
+            const gameType = titles[type] || '抽奖游戏';
+            const modeName = modeNames[currentLottery.mode] || '幸运抽奖';
+            
+            gameTitle.innerHTML = `
+                ${gameType}
+                <span class="mode-badge ${currentLottery.mode || 'verbal'}">${modeName}</span>
+            `;
             
             // 显示对应的游戏
             switch(type) {

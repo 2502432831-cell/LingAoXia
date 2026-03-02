@@ -707,12 +707,25 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .lottery-card-mode.batch {
-            color: #52c41a;
+        .lottery-card-mode.verbal {
+            color: #1890ff;
         }
 
         .lottery-card-mode.individual {
             color: #fa8c16;
+        }
+
+        .lottery-card-mode.group {
+            color: #52c41a;
+        }
+
+        .lottery-card-mode.class {
+            color: #722ed1;
+        }
+
+        /* 兼容旧数据 */
+        .lottery-card-mode.batch {
+            color: #52c41a;
         }
 
         .lottery-card-menu {
@@ -2298,6 +2311,33 @@
             background: #e6f7ff;
         }
 
+        /* 禁用状态 */
+        .lottery-mode-radio input[type="radio"]:disabled {
+            cursor: not-allowed;
+        }
+
+        .lottery-mode-radio:has(input[type="radio"]:disabled) {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .lottery-mode-radio:has(input[type="radio"]:disabled) .radio-label {
+            cursor: not-allowed;
+        }
+
+        /* 禁用状态下仍保持选中样式 */
+        .lottery-mode-radio:has(input[type="radio"]:disabled:checked) {
+            border-color: #1890ff;
+            background: #e6f7ff;
+            opacity: 0.6;
+        }
+
+        .lottery-mode-radio input[type="radio"]:disabled:checked + .radio-label {
+            color: #1890ff;
+            font-weight: 500;
+        }
+
+
         .modal-footer {
             padding: 15px 20px;
             border-top: 1px solid #f0f0f0;
@@ -3454,18 +3494,6 @@
             <button class="record-btn" onclick="openRecordModal()" title="查看抽奖记录">📋</button>
             
             <!-- 抽奖模式选择器 -->
-            <div class="lottery-mode-selector">
-                <div class="mode-option active" onclick="selectLotteryMode('lucky')">
-                    <div class="mode-radio"></div>
-                    <span>幸运抽奖</span>
-                    <span class="mode-hint">口头指定学生抽奖</span>
-                </div>
-                <div class="mode-option" onclick="selectLotteryMode('exclusive')">
-                    <div class="mode-radio"></div>
-                    <span>专属抽奖</span>
-                    <span class="mode-hint">先选中指定学生抽奖</span>
-                </div>
-            </div>
             
             <h1 class="game-title" id="gameTitle">
                 抽奖游戏
@@ -3483,18 +3511,20 @@
                             <option value="">九年级1班</option>
                             <!-- 班级选项将动态生成 -->
                         </select>
-                        <select class="group-selector" id="groupSelector" onchange="filterStudents()">
-                            <option value="">全体学生</option>
-                            <option value="individual">个人抽奖</option>
-                            <option value="1">1组</option>
-                            <option value="2">2组</option>
-                            <option value="3">3组</option>
-                            <option value="4">4组</option>
-                            <option value="5">5组</option>
-                            <option value="6">6组</option>
-                            <option value="7">7组</option>
-                            <option value="8">8组</option>
-                        </select>
+                        <div id="groupSelectorContainer">
+                            <select class="group-selector" id="groupSelector" onchange="filterStudents()">
+                                <option value="">全体学生</option>
+                                <option value="individual">个人抽奖</option>
+                                <option value="1">1组</option>
+                                <option value="2">2组</option>
+                                <option value="3">3组</option>
+                                <option value="4">4组</option>
+                                <option value="5">5组</option>
+                                <option value="6">6组</option>
+                                <option value="7">7组</option>
+                                <option value="8">8组</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="sidebar-stats">
@@ -3606,18 +3636,29 @@
                 </div>
 
                 <div class="form-group">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <label class="form-label">抽奖模式：</label>
-                        <span style="color: #999; font-size: 12px;">💡 批量抽奖：一次性为多个学生抽奖；单人抽奖：每次为一个学生抽奖</span>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <label class="form-label" id="lotteryModeLabel">抽奖模式：</label>
+                        <span id="lotteryModeHint" style="color: #999; font-size: 12px;">💡 口头指定学生进行抽奖</span>
+                        <span id="modeEditHint" style="display: none; color: #ff9800; font-size: 12px;">
+                            ⓘ 编辑模式下不允许更换抽奖模式
+                        </span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 20px; margin-top: 10px;">
+                    <div id="lotteryModeRadios" style="display: flex; flex-wrap: wrap; gap: 15px;">
                         <label class="lottery-mode-radio">
-                            <input type="radio" name="lotteryMode" value="individual" checked onchange="selectLotteryModeRadio('individual')">
+                            <input type="radio" name="lotteryMode" value="verbal" checked onchange="selectLotteryModeRadio('verbal')">
+                            <span class="radio-label">口头指定抽奖</span>
+                        </label>
+                        <label class="lottery-mode-radio">
+                            <input type="radio" name="lotteryMode" value="individual" onchange="selectLotteryModeRadio('individual')">
                             <span class="radio-label">单人抽奖</span>
                         </label>
                         <label class="lottery-mode-radio">
-                            <input type="radio" name="lotteryMode" value="batch" onchange="selectLotteryModeRadio('batch')">
-                            <span class="radio-label">批量抽奖</span>
+                            <input type="radio" name="lotteryMode" value="group" onchange="selectLotteryModeRadio('group')">
+                            <span class="radio-label">小组抽奖</span>
+                        </label>
+                        <label class="lottery-mode-radio">
+                            <input type="radio" name="lotteryMode" value="class" onchange="selectLotteryModeRadio('class')">
+                            <span class="radio-label">全班抽奖</span>
                         </label>
                     </div>
                 </div>
@@ -3779,128 +3820,176 @@
         ];
 
         let lotteries = [
+            // 开心刮刮乐 - 4种模式
             {
                 id: 1,
-                title: '自主学习之星摇奖活动',
+                title: '开心刮刮乐-口头指定抽奖',
                 gradient: gradients[0],
                 type: '开心刮刮乐',
-                mode: 'batch',
-                createTime: '2026/01/08 06:18',
-                prizes: ['奖励书一本', '奖励铅笔一支', '奖励礼品一份']
+                mode: 'verbal',
+                createTime: '2026/01/12 10:00',
+                prizes: [
+                    { name: '奖励书一本', count: 2 },
+                    { name: '奖励铅笔一支', count: 3 },
+                    { name: '奖励礼品一份', count: 2 },
+                    { name: '奖励奖状一个', count: 3 }
+                ]
             },
             {
                 id: 2,
-                title: '月度优秀学生抽奖',
+                title: '开心刮刮乐-单人抽奖',
                 gradient: gradients[1],
                 type: '开心刮刮乐',
-                createTime: '2026/01/07 06:18',
-                prizes: ['现金红包', '购物卡', '电影票']
+                mode: 'individual',
+                createTime: '2026/01/11 10:00',
+                prizes: [
+                    { name: '现金红包', count: 2 },
+                    { name: '购物卡', count: 3 },
+                    { name: '电影票', count: 2 },
+                    { name: '优惠券', count: 3 }
+                ]
             },
             {
                 id: 3,
-                title: '新年幸运大抽奖',
+                title: '开心刮刮乐-小组抽奖',
                 gradient: gradients[2],
                 type: '开心刮刮乐',
-                createTime: '2026/01/06 06:18',
-                prizes: ['手机', '平板电脑', '蓝牙耳机']
+                mode: 'group',
+                createTime: '2026/01/10 10:00',
+                prizes: [
+                    { name: '手机', count: 1 },
+                    { name: '平板电脑', count: 1 },
+                    { name: '蓝牙耳机', count: 3 },
+                    { name: '充电宝', count: 5 }
+                ]
             },
             {
                 id: 4,
-                title: '期中考试活动抽奖',
+                title: '开心刮刮乐-全班抽奖',
                 gradient: gradients[3],
-                type: '幸运转盘',
-                mode: 'batch',
-                createTime: '2026/01/05 06:18',
-                prizes: ['旅游券', '健身卡', '美食券']
+                type: '开心刮刮乐',
+                mode: 'class',
+                createTime: '2026/01/09 10:00',
+                prizes: [
+                    { name: '奖学金', count: 3 },
+                    { name: '荣誉证书', count: 5 },
+                    { name: '学习用品', count: 10 },
+                    { name: '纪念品', count: 12 }
+                ]
             },
+            // 幸运转盘 - 4种模式
             {
                 id: 5,
-                title: '期末考试抽奖活动',
+                title: '幸运转盘-口头指定抽奖',
                 gradient: gradients[4],
                 type: '幸运转盘',
-                createTime: '2026/01/04 06:18',
-                prizes: ['礼品套装', '优惠券', '积分奖励']
+                mode: 'verbal',
+                createTime: '2026/01/08 10:00',
+                prizes: [
+                    { name: '旅游券', count: 2 },
+                    { name: '健身卡', count: 2 },
+                    { name: '美食券', count: 3 },
+                    { name: '谢谢参与', count: 3 }
+                ]
             },
             {
                 id: 6,
-                title: '编程之星抽奖',
+                title: '幸运转盘-单人抽奖',
                 gradient: gradients[5],
                 type: '幸运转盘',
-                createTime: '2026/01/03 06:18',
-                prizes: ['奖金', '奖杯', '荣誉证书']
+                mode: 'individual',
+                createTime: '2026/01/07 10:00',
+                prizes: [
+                    { name: '礼品套装', count: 2 },
+                    { name: '优惠券', count: 3 },
+                    { name: '积分奖励', count: 3 },
+                    { name: '谢谢参与', count: 2 }
+                ]
             },
             {
                 id: 7,
-                title: 'AI学伴抽奖活动',
+                title: '幸运转盘-小组抽奖',
                 gradient: gradients[6],
-                type: '九宫格',
-                mode: 'batch',
-                createTime: '2026/01/02 06:18',
-                prizes: ['笔记本电脑', '智能手表', '无线耳机']
+                type: '幸运转盘',
+                mode: 'group',
+                createTime: '2026/01/06 10:00',
+                prizes: [
+                    { name: '奖金', count: 2 },
+                    { name: '奖杯', count: 1 },
+                    { name: '荣誉证书', count: 3 },
+                    { name: '纪念奖', count: 4 }
+                ]
             },
             {
                 id: 8,
-                title: '员工生日会抽奖',
+                title: '幸运转盘-全班抽奖',
                 gradient: gradients[7],
-                type: '九宫格',
-                createTime: '2026/01/01 06:18',
-                prizes: ['生日蛋糕券', '鲜花', '礼品卡']
+                type: '幸运转盘',
+                mode: 'class',
+                createTime: '2026/01/05 10:00',
+                prizes: [
+                    { name: '一等奖', count: 2 },
+                    { name: '二等奖', count: 5 },
+                    { name: '三等奖', count: 10 },
+                    { name: '参与奖', count: 13 }
+                ]
             },
+            // 九宫格 - 4种模式
             {
                 id: 9,
-                title: '国庆学习之星抽奖',
+                title: '九宫格-口头指定抽奖',
                 gradient: gradients[8],
                 type: '九宫格',
-                createTime: '2025/12/30 06:18',
-                prizes: ['团队聚餐', '休假券', '奖金']
+                mode: 'verbal',
+                createTime: '2026/01/04 10:00',
+                prizes: [
+                    { name: '笔记本电脑', count: 1 },
+                    { name: '智能手表', count: 2 },
+                    { name: '无线耳机', count: 3 },
+                    { name: '谢谢参与', count: 4 }
+                ]
             },
             {
                 id: 10,
-                title: '自主学习抽奖',
+                title: '九宫格-单人抽奖',
                 gradient: gradients[9],
                 type: '九宫格',
-                createTime: '2025/12/29 06:18',
-                prizes: ['年终奖', '购物卡', '旅游基金']
+                mode: 'individual',
+                createTime: '2026/01/03 10:00',
+                prizes: [
+                    { name: '生日蛋糕券', count: 2 },
+                    { name: '鲜花', count: 3 },
+                    { name: '礼品卡', count: 3 },
+                    { name: '谢谢参与', count: 2 }
+                ]
             },
             {
                 id: 11,
-                title: '春节特别抽奖活动',
+                title: '九宫格-小组抽奖',
                 gradient: gradients[0],
                 type: '九宫格',
-                createTime: '2025-12-28 06:18',
-                prizes: ['红包', '福袋', '新年礼盒']
+                mode: 'group',
+                createTime: '2026/01/02 10:00',
+                prizes: [
+                    { name: '团队聚餐', count: 1 },
+                    { name: '休假券', count: 2 },
+                    { name: '奖金', count: 3 },
+                    { name: '纪念品', count: 4 }
+                ]
             },
             {
                 id: 12,
-                title: '学生福利大抽奖',
+                title: '九宫格-全班抽奖',
                 gradient: gradients[1],
                 type: '九宫格',
-                createTime: '2025/12/27 06:18',
-                prizes: ['健康体检', '健身年卡', '电影年卡']
-            },
-            {
-                id: 13,
-                title: 'AI学习抽奖',
-                gradient: gradients[2],
-                type: '九宫格',
-                createTime: '2025/12/26 06:18',
-                prizes: ['新品试用', '优惠券', '周边礼品']
-            },
-            {
-                id: 14,
-                title: '前10名专属抽奖',
-                gradient: gradients[3],
-                type: '九宫格',
-                createTime: '2025/12/25 06:18',
-                prizes: ['会员升级', '积分翻倍', '专属礼包']
-            },
-            {
-                id: 15,
-                title: '圣诞节惊喜抽奖',
-                gradient: gradients[4],
-                type: '九宫格',
-                createTime: '2025/12/24 06:18',
-                prizes: ['圣诞礼物', '节日红包', '神秘大奖']
+                mode: 'class',
+                createTime: '2026/01/01 10:00',
+                prizes: [
+                    { name: '年终奖', count: 3 },
+                    { name: '购物卡', count: 5 },
+                    { name: '旅游基金', count: 7 },
+                    { name: '纪念奖', count: 15 }
+                ]
             }
         ];
 
@@ -4010,7 +4099,7 @@
                         <div class="prd-section-title">功能逻辑</div>
                         <div class="prd-section-content">
                             <ul>
-                                <li><strong>列表展示：</strong>以卡片形式展示抽奖活动，包含封面图（每种抽奖类型一个封面图）、标题（当标题超过卡片宽度时显示省略号）、类型标签（活动类型名称）、创建时间（年-月-日 时：分）、奖品数量（实际的奖品数量）</li>
+                                <li><strong>列表展示：</strong>以卡片形式展示抽奖活动，包含封面图（每种抽奖类型一个封面图）、标题（当标题超过卡片宽度时显示省略号）、类型标签（活动类型名称）、抽奖模式标签（口头指定抽奖/单人抽奖/小组抽奖/全班抽奖，不同模式显示不同颜色。单人抽奖模式下必须先选中学生后才能进行抽奖）、创建时间（年-月-日 时：分）、奖品数量（实际的奖品数量）</li>
                                 <li><strong>筛选功能：</strong>支持按时间段（近一周/近一个月/近六个月/近一年/全部）和类型（开心刮刮乐/幸运转盘/九宫格）筛选，默认选中"全部"</li>
                                 <li><strong>搜索功能：</strong>支持按标题关键字搜索</li>
                                 <li><strong>分页功能：</strong>支持设置每页显示数量（10/20/30/40/50/100条），默认20条/页，支持上一页/下一页切换</li>
@@ -4043,7 +4132,20 @@
                         <div class="prd-section-title">功能逻辑</div>
                         <div class="prd-section-content">
                             <ul>
-                                <li><strong>基本信息：</strong>抽奖标题（必填，不超过20个字）、抽奖类型（开心刮刮乐/幸运转盘/九宫格）、抽奖模式（单人抽奖/批量抽奖，通过单选按钮选择，默认为单人抽奖）</li>
+                                <li><strong>基本信息：</strong>
+                                    <ul>
+                                        <li>抽奖标题：必填，不超过20个字</li>
+                                        <li>抽奖类型：开心刮刮乐/幸运转盘/九宫格，通过卡片选择</li>
+                                        <li>抽奖模式（必填）：口头指定抽奖/单人抽奖/小组抽奖/全班抽奖，通过单选按钮选择，默认为口头指定抽奖
+                                            <ul>
+                                                <li>口头指定抽奖：提示文案"口头指定学生进行抽奖"</li>
+                                                <li>单人抽奖：提示文案"必须先选中指定学生后才能进行抽奖"</li>
+                                                <li>小组抽奖：提示文案"选择小组后点击批量抽奖按钮为该小组进行抽奖"</li>
+                                                <li>全班抽奖：提示文案"先选中全班学生再进行批量抽奖"</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
                                 <li><strong>奖品配置：</strong>
                                     <ul>
                                         <li>默认预制4种奖品：奖励书一本×1、奖励铅笔一支×1、奖励礼品一份×1、奖励奖状一个×1</li>
@@ -4061,6 +4163,7 @@
                         <div class="prd-section-content">
                             <ul>
                                 <li>选择抽奖类型后，显示对应的类型卡片高亮效果，并更新奖品配置提示语</li>
+                                <li>选择抽奖模式后，右侧提示文案自动更新为对应模式的说明</li>
                                 <li>点击"添加奖品"按钮，新增奖品输入框（开心刮刮乐、幸运转盘和九宫格都显示名称和数量两个输入框）</li>
                                 <li>点击奖品右侧"✏️"按钮，编辑该奖品</li>
                                 <li>点击奖品右侧"🗑️"按钮，删除该奖品</li>
@@ -4077,7 +4180,7 @@
                     <div class="prd-section">
                         <div class="prd-section-title">功能描述</div>
                         <div class="prd-section-content">
-                            刮刮乐抽奖游戏，用户通过刮开卡片涂层查看中奖结果。支持幸运抽奖和专属抽奖两种模式。
+                            刮刮乐抽奖游戏，用户通过刮开卡片涂层查看中奖结果。根据创建时选择的抽奖模式（口头指定抽奖/单人抽奖/小组抽奖/全班抽奖）自动适配不同的交互方式。
                         </div>
                     </div>
                     <div class="prd-section">
@@ -4088,11 +4191,11 @@
                                 <li><strong>奖品分配：</strong>根据每个奖品设置的数量生成对应数量的刮刮卡，随机打乱顺序显示</li>
                                 <li><strong>抽奖模式：</strong>
                                     <ul>
-                                        <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
-                                        <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击或在刮奖区域按下提示“请先选择学生后再抽奖”，选中学生可以直接刮奖。</li>
+                                        <li>口头指定抽奖：口头指定学生抽奖，抽奖结果无需绑定学生</li>
+                                        <li>单人抽奖、小组抽奖、全班抽奖：当未选中学生时，点击或在刮奖区域按下提示“请先选择学生后再抽奖”，选中学生可以直接刮奖。</li>
                                         <li>学生名单显示在音乐按钮下方的左侧侧边栏，侧边栏顶部显示"学生名单"标题和班级下拉框（支持按班级筛选），下方显示搜索框（支持按学生姓名模糊查询），学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
-                                        <li>学生选择方式：单人抽奖模式下，学生列表中无复选框，用户直接点击学生项选中该学生（高亮显示），再进行抽奖；批量抽奖模式下，在"全体学生"分组下，学生列表上方显示全选复选框，每个学生前显示单独的复选框，用户可勾选多个学生进行批量抽奖。</li>
-                                        <li>批量抽奖：在学生列表下方提供"批量抽奖"按钮，仅在批量抽奖模式下可用。批量抽奖模式下，刮刮卡不能用鼠标/手指手动刮开，学生列表上方显示全选复选框，每个学生前显示单独的复选框，默认全部勾选，用户可以取消勾选不需要抽奖的学生，点击"批量抽奖"按钮后只对勾选的学生进行抽奖。系统同时刮开和学生数量对等的刮刮卡（每个学生对应一张卡片），所有卡片同时执行刮开动画（从上到下清除画布），刮开完成后弹窗展示所有学生的中奖结果（以奖品为主体归纳显示，每个奖品显示获得该奖品的所有学生名单，如"优惠券：张三、李四、王五"），抽奖记录自动保存（mode='batch'），可通过"查看抽奖结果"按钮查看本次批量抽奖的累计结果。当未勾选学生时，点击"批量抽奖"提示"请先勾选要抽奖的学生"；当勾选的学生都已抽过奖时，提示"选中的学生都已经抽过奖了"；当所有奖品都被抽完时，提示"奖品已全部抽完！"。</li>
+                                        <li>学生选择方式：单人抽奖模式下，学生列表中无复选框，用户直接点击学生项选中该学生（选中后学生项背景变为浅蓝色#e8f0fe，边框变为蓝色#2B5FED进行高亮显示），必须选中学生后才能进行抽奖；小组抽奖模式下，显示分组选择器，学生列表中无复选框，点击"批量抽奖"按钮直接对当前选中小组的所有学生进行批量抽奖；全班抽奖模式下，学生列表上方显示全选复选框，每个学生前显示单独的复选框，用户可勾选多个学生进行批量抽奖。</li>
+                                        <li>小组抽奖、全班抽奖：在学生列表下方提供"批量抽奖"按钮，仅在小组抽奖和全班抽奖模式下可用。小组抽奖模式下，刮刮卡不能用鼠标/手指手动刮开（点击刮刮卡区域提示"请点击'批量抽奖'按键进行批量抽奖"），点击"批量抽奖"按钮后自动对当前选中小组的所有学生进行抽奖（当前小组没有学生时提示"当前小组没有学生"）；全班抽奖模式下，刮刮卡不能用鼠标/手指手动刮开（点击刮刮卡区域提示"请点击'批量抽奖'按键进行批量抽奖"），学生列表上方显示全选复选框，每个学生前显示单独的复选框，默认全部勾选，用户可以取消勾选不需要抽奖的学生，点击"批量抽奖"按钮后只对勾选的学生进行抽奖。当奖品数量少于待抽奖学生数量时，弹出确认对话框"奖品不足，继续抽奖只会为部分学生分配奖品，你确定继续吗？"，提供"继续"、"取消"按钮。系统同时刮开和学生数量对等的刮刮卡（每个学生对应一张卡片），所有卡片同时执行刮开动画（从上到下清除画布），刮开完成后弹窗展示所有学生的中奖结果（以奖品为主体归纳显示，每个奖品显示获得该奖品的所有学生名单，如"优惠券：张三、李四、王五"），抽奖记录自动保存（mode='batch'），可通过"查看抽奖结果"按钮查看本次批量抽奖的累计结果。全班抽奖模式下，当未勾选学生时，点击"批量抽奖"提示"请先勾选要抽奖的学生"；当勾选的学生都已抽过奖时，提示"选中的学生都已经抽过奖了"；当所有奖品都被抽完时，提示"奖品已全部抽完！"。</li>
                                     </ul>
                                 </li>
                                 <li><strong>刮奖机制：</strong>
@@ -4112,8 +4215,8 @@
                         <div class="prd-section-title">交互逻辑</div>
                         <div class="prd-section-content">
                             <ul>
-                                <li>选择抽奖模式：点击"幸运抽奖"或"专属抽奖"切换模式</li>
-                                <li>专属抽奖模式：左侧显示学生名单（位于音乐按钮下方），点击选中学生后才能抽奖</li>
+                                
+                               
                                 <li>鼠标/手指按下并移动：刮开涂层</li>
                                 <li>刮开达到阈值：自动显示奖品并弹出提示，记录抽奖结果</li>
                                 <li>点击弹窗"确定"按钮或弹窗外部区域：立即关闭弹窗</li>
@@ -4151,11 +4254,11 @@
                                 </li>
                                 <li><strong>抽奖模式：</strong>
                                     <ul>
-                                        <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
-                                        <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击抽奖提示“请先选择学生后再抽奖”，选中学生可以直接点击抽奖。</li>
+                                        <li>口头指定抽奖：口头指定学生抽奖，抽奖结果无需绑定学生</li>
+                                        <li>单人抽奖、小组抽奖、全班抽奖：当未选中学生时，点击抽奖提示“请先选择学生后再抽奖”，选中学生可以直接点击抽奖。</li>
                                         <li>学生名单显示在音乐按钮下方的左侧侧边栏，侧边栏顶部显示"学生名单"标题和班级下拉框（支持按班级筛选），下方显示搜索框（支持按学生姓名模糊查询），学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
-                                        <li>学生选择方式：单人抽奖模式下，学生列表中无复选框，用户直接点击学生项选中该学生（高亮显示），再进行抽奖；批量抽奖模式下，在"全体学生"分组下，学生列表上方显示全选复选框，每个学生前显示单独的复选框，用户可勾选多个学生进行批量抽奖。</li>
-                                        <li>批量抽奖：在学生列表下方提供"批量抽奖"按钮，仅在批量抽奖模式下可用。批量抽奖模式下，转盘中心按钮去掉"抽奖"文案且不能点击，学生列表上方显示全选复选框，每个学生前显示单独的复选框，默认全部勾选，用户可以取消勾选不需要抽奖的学生，点击"批量抽奖"按钮后只对勾选的学生进行抽奖。转盘旋转3秒（旋转3圈，先快后慢），旋转完成后弹窗展示所有学生的中奖结果（以奖品为主体归纳显示，每个奖品显示获得该奖品的所有学生名单，如"优惠券：张三、李四、王五"），抽奖记录自动保存（mode='batch'），可通过"查看抽奖结果"按钮查看本次批量抽奖的累计结果。当未勾选学生时，点击"批量抽奖"提示"请先勾选要抽奖的学生"；当勾选的学生都已抽过奖时，提示"选中的学生都已经抽过奖了"；当所有奖品都被抽完时，提示"奖品已全部抽完！"。</li>
+                                        <li>学生选择方式：单人抽奖模式下，学生列表中无复选框，用户直接点击学生项选中该学生（选中后学生项背景变为浅蓝色#e8f0fe，边框变为蓝色#2B5FED进行高亮显示），必须选中学生后才能进行抽奖；小组抽奖模式下，显示分组选择器，学生列表中无复选框，点击"批量抽奖"按钮直接对当前选中小组的所有学生进行批量抽奖；全班抽奖模式下，学生列表上方显示全选复选框，每个学生前显示单独的复选框，用户可勾选多个学生进行批量抽奖。</li>
+                                        <li>小组抽奖、全班抽奖：在学生列表下方提供"批量抽奖"按钮，仅在小组抽奖和全班抽奖模式下可用。小组抽奖模式下，转盘中心按钮去掉"抽奖"文案且不能点击（点击转盘中心按钮提示"请点击'批量抽奖'按键进行批量抽奖"），点击"批量抽奖"按钮后自动对当前选中小组的所有学生进行抽奖（当前小组没有学生时提示"当前小组没有学生"）；全班抽奖模式下，转盘中心按钮去掉"抽奖"文案且不能点击（点击转盘中心按钮提示"请点击'批量抽奖'按键进行批量抽奖"），学生列表上方显示全选复选框，每个学生前显示单独的复选框，默认全部勾选，用户可以取消勾选不需要抽奖的学生，点击"批量抽奖"按钮后只对勾选的学生进行抽奖。当奖品数量少于待抽奖学生数量时，弹出确认对话框"奖品不足，继续抽奖只会为部分学生分配奖品，你确定继续吗？"，提供"继续"、"取消"按钮。转盘旋转3秒（旋转3圈，先快后慢），旋转完成后弹窗展示所有学生的中奖结果（以奖品为主体归纳显示，每个奖品显示获得该奖品的所有学生名单，如"优惠券：张三、李四、王五"），抽奖记录自动保存（mode='batch'），可通过"查看抽奖结果"按钮查看本次批量抽奖的累计结果。全班抽奖模式下，当未勾选学生时，点击"批量抽奖"提示"请先勾选要抽奖的学生"；当勾选的学生都已抽过奖时，提示"选中的学生都已经抽过奖了"；当所有奖品都被抽完时，提示"奖品已全部抽完！"。</li>
                                     </ul>
                                 </li>
                                 <li><strong>转动机制：</strong>
@@ -4170,7 +4273,7 @@
                                 </li>
                                 <li><strong>防重复点击：</strong>转动过程中禁用抽奖按钮</li>
                                 <li><strong>音乐控制：</strong>左上角音乐开关按钮，控制背景音乐播放</li>
-                                <li><strong>抽奖记录：</strong>在背景音乐开关的右侧提供该活动历史"抽奖记录"按钮，点击后以网格卡片形式展示当前活动所有已抽奖学生的中奖结果（自适应布局，一屏显示）</li>
+                                <li><strong>抽奖记录：</strong>在背景音乐开关的右侧提供该活动历史"抽奖记录"按钮，点击后以网格卡片形式展示当前活动所有已抽奖学生的中奖结果（自适应布局，一屏显示）。单人抽奖、小组抽奖、全班抽奖的记录都会自动保存，学生所抽奖品会实时记录在学生名单中，点击"查看抽奖结果"按钮可查看本次活动所有学生的抽奖结果。</li>
                             </ul>
                         </div>
                     </div>
@@ -4178,8 +4281,8 @@
                         <div class="prd-section-title">交互逻辑</div>
                         <div class="prd-section-content">
                             <ul>
-                                <li>选择抽奖模式：点击"幸运抽奖"或"专属抽奖"切换模式</li>
-                                <li>专属抽奖模式：左侧显示学生名单（位于音乐按钮下方），点击选中学生后才能抽奖</li>
+                                
+                               
                                 <li>点击"抽奖"按钮：开始转动转盘</li>
                                 <li>转动过程：按钮文字变为"抽奖中..."，禁用点击</li>
                                 <li>转动结束：弹窗显示中奖结果，记录抽奖结果，3秒倒计时后自动关闭</li>
@@ -4205,8 +4308,8 @@
                         <div class="prd-section-title">功能逻辑</div>
                         <div class="prd-section-content">
                             <ul>
-                                <li><strong>游戏界面：</strong>3×3网格布局，中心为"开始抽奖"按钮，周围8个格子显示奖品</li>
-                                <li><strong>奖品展示：</strong>每个格子显示奖品图标和名称，只显示当前还有剩余数量的奖品种类，不足9种的格子显示"谢谢参与"</li>
+                                <li><strong>游戏界面：</strong>3×3网格布局，底部为"开始抽奖"按钮，9个格子显示奖品</li>
+                                <li><strong>奖品展示：</strong>每个格子显示奖品图标和名称，只显示当前还有剩余数量的奖品种类，不足9种的格子显示"谢谢参与"，每个谢谢参与为1个奖品类型、数量为1个</li>
                                 <li><strong>奖品池机制：</strong>
                                     <ul>
                                         <li>最多添加9种奖品类型，奖品总数最多50个</li>
@@ -4218,16 +4321,16 @@
                                 </li>
                                 <li><strong>抽奖模式：</strong>
                                     <ul>
-                                        <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
-                                        <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击开始抽奖提示“请先选择学生后再抽奖”，选中学生可以直接点击开始抽奖。</li>
+                                        <li>口头指定抽奖：口头指定学生抽奖，抽奖结果无需绑定学生</li>
+                                        <li>单人抽奖、小组抽奖、全班抽奖：当未选中学生时，点击开始抽奖提示“请先选择学生后再抽奖”，选中学生可以直接点击开始抽奖。</li>
                                         <li>学生名单显示在音乐按钮下方的左侧侧边栏，侧边栏顶部显示"学生名单"标题和班级下拉框（支持按班级筛选），下方显示搜索框（支持按学生姓名模糊查询），学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
-                                        <li>学生选择方式：单人抽奖模式下，学生列表中无复选框，用户直接点击学生项选中该学生（高亮显示），再进行抽奖；批量抽奖模式下，在"全体学生"分组下，学生列表上方显示全选复选框，每个学生前显示单独的复选框，用户可勾选多个学生进行批量抽奖。</li>
-                                        <li>批量抽奖：在学生列表下方提供"批量抽奖"按钮，仅在批量抽奖模式下可用。批量抽奖模式下，九宫格中心隐藏"开始抽奖"按钮，学生列表上方显示全选复选框，每个学生前显示单独的复选框，默认全部勾选，用户可以取消勾选不需要抽奖的学生，点击"批量抽奖"按钮后只对勾选的学生进行抽奖。九宫格跑马灯3秒（格子按顺时针方向依次高亮，每格40ms），跑马灯完成后弹窗展示所有学生的中奖结果（以奖品为主体归纳显示，每个奖品显示获得该奖品的所有学生名单，如"优惠券：张三、李四、王五"），抽奖记录自动保存（mode='batch'），可通过"查看抽奖结果"按钮查看本次批量抽奖的累计结果。当未勾选学生时，点击"批量抽奖"提示"请先勾选要抽奖的学生"；当勾选的学生都已抽过奖时，提示"选中的学生都已经抽过奖了"；当所有奖品都被抽完时，提示"奖品已全部抽完！"。</li>
+                                        <li>学生选择方式：单人抽奖模式下，学生列表中无复选框，用户直接点击学生项选中该学生（选中后学生项背景变为浅蓝色#e8f0fe，边框变为蓝色#2B5FED进行高亮显示），必须选中学生后才能进行抽奖；小组抽奖模式下，显示分组选择器，学生列表中无复选框，点击"批量抽奖"按钮直接对当前选中小组的所有学生进行批量抽奖；全班抽奖模式下，学生列表上方显示全选复选框，每个学生前显示单独的复选框，用户可勾选多个学生进行批量抽奖。</li>
+                                        <li>小组抽奖、全班抽奖：在学生列表下方提供"批量抽奖"按钮，仅在小组抽奖和全班抽奖模式下可用。小组抽奖模式下，九宫格中心隐藏"开始抽奖"按钮（点击九宫格区域提示"请点击'批量抽奖'按键进行批量抽奖"），点击"批量抽奖"按钮后自动对当前选中小组的所有学生进行抽奖（当前小组没有学生时提示"当前小组没有学生"）；全班抽奖模式下，九宫格中心隐藏"开始抽奖"按钮（点击九宫格区域提示"请点击'批量抽奖'按键进行批量抽奖"），学生列表上方显示全选复选框，每个学生前显示单独的复选框，默认全部勾选，用户可以取消勾选不需要抽奖的学生，点击"批量抽奖"按钮后只对勾选的学生进行抽奖。当奖品数量少于待抽奖学生数量时，弹出确认对话框"奖品不足，继续抽奖只会为部分学生分配奖品，你确定继续吗？"，提供"继续"、"取消"按钮。九宫格跑马灯3秒（格子按顺时针方向依次高亮，每格40ms），跑马灯完成后弹窗展示所有学生的中奖结果（以奖品为主体归纳显示，每个奖品显示获得该奖品的所有学生名单，如"优惠券：张三、李四、王五"），抽奖记录自动保存（mode='batch'），可通过"查看抽奖结果"按钮查看本次批量抽奖的累计结果。全班抽奖模式下，当未勾选学生时，点击"批量抽奖"提示"请先勾选要抽奖的学生"；当勾选的学生都已抽过奖时，提示"选中的学生都已经抽过奖了"；当所有奖品都被抽完时，提示"奖品已全部抽完！"。</li>
                                     </ul>
                                 </li>
                                 <li><strong>跑马灯机制：</strong>
                                     <ul>
-                                        <li>点击"开始抽奖"按钮，格子按顺时针方向依次高亮</li>
+                                        <li>口头指定抽奖和单人抽奖模式下，九宫格下方显示"开始抽奖"按钮，点击按钮后格子按顺时针方向依次高亮</li>
                                         <li>初始速度较快，逐渐减速</li>
                                         <li>停止在随机选中的奖品格子上</li>
                                         <li>弹窗显示中奖结果：抽中奖品显示"恭喜中奖"和奖品名称，抽中"谢谢参与"显示"很遗憾，未抽中奖品"</li>
@@ -4237,7 +4340,7 @@
                                 </li>
                                 <li><strong>防重复点击：</strong>抽奖过程中禁用开始按钮</li>
                                 <li><strong>音乐控制：</strong>左上角音乐开关按钮，控制背景音乐播放</li>
-                                <li><strong>抽奖记录：</strong>在背景音乐开关的右侧提供该活动历史"抽奖记录"按钮，点击后以网格卡片形式展示当前活动所有已抽奖学生的中奖结果（自适应布局，一屏显示）</li>
+                                <li><strong>抽奖记录：</strong>在背景音乐开关的右侧提供该活动历史"抽奖记录"按钮，点击后以网格卡片形式展示当前活动所有已抽奖学生的中奖结果（自适应布局，一屏显示）。单人抽奖、小组抽奖、全班抽奖的记录都会自动保存，学生所抽奖品会实时记录在学生名单中，点击"查看抽奖结果"按钮可查看本次活动所有学生的抽奖结果。</li>
                             </ul>
                         </div>
                     </div>
@@ -4245,8 +4348,8 @@
                         <div class="prd-section-title">交互逻辑</div>
                         <div class="prd-section-content">
                             <ul>
-                                <li>选择抽奖模式：点击"幸运抽奖"或"专属抽奖"切换模式</li>
-                                <li>专属抽奖模式：左侧显示学生名单（位于音乐按钮下方），点击选中学生后才能抽奖</li>
+                                
+                               
                                 <li>点击"开始抽奖"按钮：启动跑马灯抽奖</li>
                                 <li>抽奖过程：格子依次高亮，按钮禁用</li>
                                 <li>抽奖结束：中奖格子保持高亮，弹窗显示中奖结果，记录抽奖结果，九宫格自动更新，3秒倒计时后自动关闭</li>
@@ -4393,9 +4496,15 @@
                 card.className = 'lottery-card';
                 
                 // 确定抽奖模式标签
-                const mode = lottery.mode || 'individual'; // 默认为单人抽奖（兼容旧数据）
-                const modeText = mode === 'batch' ? '批量抽奖' : '单人抽奖';
-                const modeClass = mode === 'batch' ? 'batch' : 'individual';
+                const mode = lottery.mode || 'verbal'; // 默认为口头指定抽奖（兼容旧数据）
+                const modeTextMap = {
+                    'verbal': '口头指定抽奖',
+                    'individual': '单人抽奖',
+                    'group': '小组抽奖',
+                    'class': '全班抽奖'
+                };
+                const modeText = modeTextMap[mode] || '单人抽奖';
+                const modeClass = mode;
                 
                 card.innerHTML = `
                     <div class="lottery-card-image" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9InNreUdyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzU1Y2NmZjtzdG9wLW9wYWNpdHk6MSIgLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM4OGRkZmY7c3RvcC1vcGFjaXR5OjEiIC8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9InVybCgjc2t5R3JhZGllbnQpIi8+PHBhdGggZD0iTTAgMjUwIFEgMTAwIDIzMCAyMDAgMjUwIFQgNDAwIDI1MCBMIDQwMCAzMDAgTCAwIDMwMCBaIiBmaWxsPSIjN2VkMzIxIi8+PGNpcmNsZSBjeD0iMzIwIiBjeT0iNjAiIHI9IjQwIiBmaWxsPSIjZmZmZjAwIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNIDgwIDEwMCBMIDEyMCA2MCBMIDE2MCAxMDAgTCAxNDAgMTAwIEwgMTQwIDE0MCBMIDEwMCAxNDAgTCAxMDAgMTAwIFoiIGZpbGw9IiNmZjY2MDAiLz48cGF0aCBkPSJNIDEyMCA2MCBMIDEzMCA0MCBMIDE0MCA2MCBaIiBmaWxsPSIjZmY5OTAwIi8+PHBhdGggZD0iTSAxMDAgMTQwIEwgOTAgMTYwIEwgMTUwIDE2MCBMIDE0MCAxNDAgWiIgZmlsbD0iI2ZmNDQwMCIvPjxlbGxpcHNlIGN4PSIyNTAiIGN5PSIxNTAiIHJ4PSI2MCIgcnk9IjgwIiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjgiLz48ZWxsaXBzZSBjeD0iMzAwIiBjeT0iMTYwIiByeD0iNTAiIHJ5PSI3MCIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC43Ii8+PGVsbGlwc2UgY3g9IjIwMCIgY3k9IjE3MCIgcng9IjQwIiByeT0iNjAiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNyIvPjxjaXJjbGUgY3g9IjI1MCIgY3k9IjE0MCIgcj0iMzUiIGZpbGw9IiMwMGNjZmYiLz48Y2lyY2xlIGN4PSIyNDUiIGN5PSIxMzUiIHI9IjI1IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjMiLz48Y2lyY2xlIGN4PSIyMzAiIGN5PSIxNTAiIHI9IjE1IiBmaWxsPSIjZmZjYzAwIi8+PGNpcmNsZSBjeD0iMjcwIiBjeT0iMTUwIiByPSIxNSIgZmlsbD0iI2ZmY2MwMCIvPjxyZWN0IHg9IjIzNSIgeT0iMTcwIiB3aWR0aD0iMzAiIGhlaWdodD0iMjAiIHJ4PSI1IiBmaWxsPSIjZmY2NjAwIi8+PHBhdGggZD0iTSAyMjAgMTgwIEwgMjE1IDE5NSBMIDIyNSAxOTUgWiIgZmlsbD0iIzAwY2NmZiIvPjxwYXRoIGQ9Ik0gMjgwIDE4MCBMIDI4NSAxOTUgTCAyNzUgMTk1IFoiIGZpbGw9IiMwMGNjZmYiLz48L3N2Zz4='); background-size: cover; background-position: center;" onclick="openGame(${lottery.id})">
@@ -4411,7 +4520,7 @@
                         <div class="lottery-card-title" title="${lottery.title}">${lottery.title}</div>
                         <div class="lottery-card-meta">
                             创建时间：${lottery.createTime}<br>
-                            奖品数量：${lottery.prizes.length}个
+                            奖品数量：${lottery.prizes.reduce((sum, prize) => sum + (typeof prize === 'string' ? 1 : prize.count), 0)}个
                         </div>
                     </div>
                 `;
@@ -4446,8 +4555,29 @@
             if (lottery) {
                 editingLotteryId = id;
                 selectedLotteryType = lottery.type;
-                selectedLotteryMode = lottery.mode || 'individual'; // 加载抽奖模式，默认为单人抽奖
-                prizeList = [...lottery.prizes]; // 复制奖品列表
+                selectedLotteryMode = lottery.mode || 'verbal'; // 加载抽奖模式，默认为口头指定抽奖
+                
+                // 复制奖品列表，对九宫格类型进行特殊处理
+                prizeList = [...lottery.prizes];
+                
+                // 对九宫格类型的活动进行特殊处理：自动补齐"谢谢参与"
+                if (selectedLotteryType === '九宫格') {
+                    // 计算当前奖品类型数量（去重）
+                    const prizeTypes = new Set();
+                    prizeList.forEach(prize => {
+                        const prizeName = typeof prize === 'string' ? prize : prize.name;
+                        prizeTypes.add(prizeName);
+                    });
+                    
+                    // 如果奖品类型不足9个，自动添加"谢谢参与"补齐
+                    const currentTypeCount = prizeTypes.size;
+                    if (currentTypeCount < 9) {
+                        const thanksCount = 9 - currentTypeCount;
+                        for (let i = 0; i < thanksCount; i++) {
+                            prizeList.push({ name: '谢谢参与', count: 1 });
+                        }
+                    }
+                }
                 
                 // 填充表单
                 document.getElementById('lotteryTitle').value = lottery.title;
@@ -4455,16 +4585,43 @@
                 document.getElementById('submitBtn').textContent = '保存修改';
                 
                 // 设置抽奖模式单选按钮
-                const radioIndividual = document.querySelector('input[name="lotteryMode"][value="individual"]');
-                const radioBatch = document.querySelector('input[name="lotteryMode"][value="batch"]');
-                if (selectedLotteryMode === 'batch') {
-                    radioBatch.checked = true;
-                } else {
-                    radioIndividual.checked = true;
+                const modeRadios = ['verbal', 'individual', 'group', 'class'];
+                modeRadios.forEach(mode => {
+                    const radio = document.querySelector(`input[name="lotteryMode"][value="${mode}"]`);
+                    if (radio) {
+                        radio.checked = (selectedLotteryMode === mode);
+                    }
+                });
+                
+                // 更新提示文案
+                const hintText = {
+                    'verbal': '💡 口头指定学生进行抽奖',
+                    'individual': '💡 必须先选中指定学生后才能进行抽奖',
+                    'group': '💡 先选中小组学生再进行批量抽奖',
+                    'class': '💡 先选中全班学生再进行批量抽奖'
+                };
+                const hintElement = document.getElementById('lotteryModeHint');
+                if (hintElement && hintText[selectedLotteryMode]) {
+                    hintElement.textContent = hintText[selectedLotteryMode];
+                }
+                
+                // 添加抽奖模式的required标记
+                const modeLabel = document.getElementById('lotteryModeLabel');
+                if (modeLabel) {
+                    modeLabel.className = 'form-label required';
                 }
                 
                 // 显示提示信息
                 document.getElementById('typeEditHint').style.display = 'block';
+                document.getElementById('modeEditHint').style.display = 'block';
+                
+                // 禁用抽奖模式选择（编辑时不允许更换模式）
+                const modeRadiosContainer = document.getElementById('lotteryModeRadios');
+                if (modeRadiosContainer) {
+                    modeRadiosContainer.querySelectorAll('input[type="radio"]').forEach(radio => {
+                        radio.disabled = true;
+                    });
+                }
                 
                 // 禁用类型选择（编辑时不允许更换类型）
                 document.querySelectorAll('.type-card').forEach(card => {
@@ -4545,7 +4702,7 @@
             const lottery = lotteries.find(l => l.id === id);
             if (lottery) {
                 currentLottery = lottery;
-                const lotteryMode = lottery.mode || 'individual'; // 获取抽奖模式，默认为单人抽奖
+                const lotteryMode = lottery.mode || 'verbal'; // 获取抽奖模式，默认为口头指定抽奖
                 
                 // 隐藏首页和列表页
                 document.getElementById('homePageNew').style.display = 'none';
@@ -4554,62 +4711,113 @@
                 document.getElementById('listPage').style.display = 'none';
                 document.getElementById('gamePage').classList.add('active');
                 
-                // 根据抽奖模式控制UI显示
-                const modeSelector = document.querySelector('.lottery-mode-selector');
-                const groupSelector = document.getElementById('groupSelector');
+                // 获取UI元素
+                const groupSelectorContainer = document.getElementById('groupSelectorContainer');
                 const selectAllContainer = document.getElementById('selectAllContainer');
                 const batchLotteryBtn = document.getElementById('batchLotteryBtn');
                 const sidebar = document.getElementById('studentSidebar');
+                const classSelector = document.getElementById('classSelector');
+                const groupSelector = document.getElementById('groupSelector');
                 
-                // 移除group-selector中的"个人抽奖"选项（单人抽奖和批量抽奖模式下都移除）
-                if (groupSelector) {
-                    const individualOption = Array.from(groupSelector.options).find(opt => opt.value === 'individual');
-                    if (individualOption) {
-                        individualOption.remove();
-                    }
-                }
-                
-                if (lotteryMode === 'batch') {
-                    // 批量抽奖模式：隐藏"幸运抽奖/专属抽奖"选择器，直接显示学生侧边栏
-                    if (modeSelector) {
-                        modeSelector.style.display = 'none';
-                    }
-                    // 显示学生侧边栏（批量抽奖模式下没有专属抽奖模式，用户直接勾选学生进行抽奖）
-                    if (sidebar) {
-                        sidebar.classList.add('active');
-                    }
-                    // 批量抽奖模式下不设置lotteryMode，用户直接勾选学生
-                    window.lotteryMode = null;
-                    window.isBatchMode = true; // 标记为批量抽奖模式
-                    // 显示批量抽奖按钮
-                    if (batchLotteryBtn) {
-                        batchLotteryBtn.style.display = 'block';
-                    }
-                    // 显示全选复选框
-                    if (selectAllContainer) {
-                        selectAllContainer.style.display = 'block';
-                    }
-                    // 默认全选所有学生
-                    selectedStudents = [...students];
-                } else {
-                    // 单人抽奖模式：显示"幸运抽奖/专属抽奖"选择器
-                    if (modeSelector) {
-                        modeSelector.style.display = 'flex';
-                    }
-                    // 默认为幸运抽奖模式，隐藏学生侧边栏
-                    window.lotteryMode = 'lucky';
-                    window.isBatchMode = false; // 标记为单人抽奖模式
+                // 根据抽奖模式控制UI显示
+                if (lotteryMode === 'verbal') {
+                    // 口头指定抽奖：无需选择学生，隐藏学生侧边栏和分组选择器
+                    window.lotteryMode = 'lucky'; // 设置为幸运抽奖模式
+                    window.isBatchMode = false;
                     if (sidebar) {
                         sidebar.classList.remove('active');
                     }
-                    // 隐藏全选复选框
+                    if (groupSelectorContainer) {
+                        groupSelectorContainer.style.display = 'none';
+                    }
                     if (selectAllContainer) {
                         selectAllContainer.style.display = 'none';
                     }
-                    // 隐藏批量抽奖按钮
                     if (batchLotteryBtn) {
                         batchLotteryBtn.style.display = 'none';
                     }
+                } else if (lotteryMode === 'individual') {
+                    // 单人抽奖：显示学生列表，无分组选择器，无复选框
+                    window.lotteryMode = 'exclusive'; // 设置为专属抽奖模式
+                    window.isBatchMode = false;
+                    selectedStudent = null; // 清空选中的学生
+                    if (sidebar) {
+                        sidebar.classList.add('active');
+                    }
+                    if (groupSelectorContainer) {
+                        groupSelectorContainer.style.display = 'none';
+                    }
+                    if (selectAllContainer) {
+                        selectAllContainer.style.display = 'none';
+                    }
+                    if (batchLotteryBtn) {
+                        batchLotteryBtn.style.display = 'none';
+                    }
+                    // 设置当前分组为全体学生（用于筛选）
+                    currentGroup = 'all';
+                    // 重置分组选择器的值，避免保留之前的分组筛选
+                    if (groupSelector) {
+                        groupSelector.value = '';
+                    }
+                } else if (lotteryMode === 'group') {
+                    // 小组抽奖：显示分组选择器（无"全体学生"和"个人抽奖"选项），不显示复选框，显示批量抽奖按钮
+                    window.lotteryMode = 'exclusive'; // 设置为专属抽奖模式
+                    window.isBatchMode = true;
+                    if (sidebar) {
+                        sidebar.classList.add('active');
+                    }
+                    if (groupSelectorContainer) {
+                        groupSelectorContainer.style.display = 'flex';
+                    }
+                    // 移除"全体学生"和"个人抽奖"选项
+                    if (groupSelector) {
+                        // 移除"全体学生"选项
+                        const allOption = Array.from(groupSelector.options).find(opt => opt.value === '' || opt.value === 'all');
+                        if (allOption) {
+                            allOption.remove();
+                        }
+                        // 移除"个人抽奖"选项
+                        const individualOption = Array.from(groupSelector.options).find(opt => opt.value === 'individual');
+                        if (individualOption) {
+                            individualOption.remove();
+                        }
+                        // 默认选择第一个分组
+                        if (groupSelector.options.length > 0) {
+                            groupSelector.selectedIndex = 0;
+                            currentGroup = groupSelector.value;
+                        }
+                    }
+                    // 小组抽奖模式下不显示全选容器和复选框
+                    if (selectAllContainer) {
+                        selectAllContainer.style.display = 'none';
+                    }
+                    if (batchLotteryBtn) {
+                        batchLotteryBtn.style.display = 'block';
+                    }
+                } else if (lotteryMode === 'class') {
+                    // 全班抽奖：无分组选择器，显示全体学生，显示复选框和批量抽奖按钮
+                    window.lotteryMode = 'exclusive'; // 设置为专属抽奖模式
+                    window.isBatchMode = true;
+                    if (sidebar) {
+                        sidebar.classList.add('active');
+                    }
+                    if (groupSelectorContainer) {
+                        groupSelectorContainer.style.display = 'none';
+                    }
+                    if (selectAllContainer) {
+                        selectAllContainer.style.display = 'block';
+                    }
+                    if (batchLotteryBtn) {
+                        batchLotteryBtn.style.display = 'block';
+                    }
+                    // 设置当前分组为全体学生
+                    currentGroup = 'all';
+                    // 重置分组选择器的值，避免保留之前的分组筛选
+                    if (groupSelector) {
+                        groupSelector.value = '';
+                    }
+                    // 默认全选所有学生
+                    selectedStudents = [...students];
                 }
                 
                 // 初始化班级选择器和学生列表
@@ -4659,9 +4867,12 @@
                     document.getElementById('gridGameContainer').style.display = 'block';
                     generateGrid();
                     // 批量抽奖模式下隐藏开始按钮
+                    const gridStartBtn = document.getElementById('gridStartBtn');
                     if (window.isBatchMode) {
-                        const startBtn = document.getElementById('gridStartBtn');
-                        if (startBtn) startBtn.style.display = 'none';
+                        if (gridStartBtn) gridStartBtn.style.display = 'none';
+                    } else {
+                        // 非批量抽奖模式下显示开始按钮
+                        if (gridStartBtn) gridStartBtn.style.display = 'block';
                     }
                     break;
             }
@@ -4780,9 +4991,15 @@
         function spinWheel() {
             if (wheelSpinning) return;
             
+            // 批量抽奖模式下，提示用户使用批量抽奖按钮
+            if (window.isBatchMode) {
+                showToast('请点击"批量抽奖"按键进行批量抽奖', 'info');
+                return;
+            }
+            
             // 检查专属抽奖模式下是否选择了学生
-            if (lotteryMode === 'exclusive' && !selectedStudent) {
-                showToast('请先选择学生后再抽奖', 'warning');
+            if (window.lotteryMode === 'exclusive' && !selectedStudent) {
+                showToast('请先选择学生后再进行抽奖', 'warning');
                 return;
             }
             
@@ -5027,9 +5244,15 @@
         function startGrid() {
             if (gridRunning) return;
             
+            // 批量抽奖模式下，提示用户使用批量抽奖按钮
+            if (window.isBatchMode) {
+                showToast('请点击"批量抽奖"按键进行批量抽奖', 'info');
+                return;
+            }
+            
             // 检查专属抽奖模式下是否选择了学生
-            if (lotteryMode === 'exclusive' && !selectedStudent) {
-                showToast('请先选择学生后再抽奖', 'warning');
+            if (window.lotteryMode === 'exclusive' && !selectedStudent) {
+                showToast('请先选择学生后再进行抽奖', 'warning');
                 return;
             }
             
@@ -5381,44 +5604,23 @@
             document.getElementById('studentSidebar').classList.remove('active');
         }
 
-        // 选择抽奖模式
-        function selectLotteryMode(mode) {
-            lotteryMode = mode;
-            
-            // 更新UI
-            document.querySelectorAll('.mode-option').forEach(option => {
-                option.classList.remove('active');
-            });
-            event.currentTarget.classList.add('active');
-            
-            // 显示/隐藏学生侧边栏
-            const sidebar = document.getElementById('studentSidebar');
-            if (mode === 'exclusive') {
-                sidebar.classList.add('active');
-                renderStudentList();
-            } else {
-                sidebar.classList.remove('active');
-                selectedStudent = null;
-            }
-        }
-
         // 渲染学生列表
         function renderStudentList() {
             const container = document.getElementById('studentList');
             container.innerHTML = '';
             
             // 获取当前抽奖活动的模式
-            const lotteryMode = currentLottery.mode || 'individual';
+            const lotteryMode = currentLottery.mode || 'verbal';
             
             // 获取当前选择的班级、分组和搜索关键词
             const selectedClass = document.getElementById('classSelector')?.value || '';
             const selectedGroup = document.getElementById('groupSelector')?.value || '';
             const searchKeyword = document.getElementById('studentSearchInput')?.value.toLowerCase().trim() || '';
             
-            // 控制全选容器的显示（仅在"批量抽奖"模式下且"全体学生"时显示）
+            // 控制全选容器的显示（仅在全班抽奖模式下显示，小组抽奖不显示）
             const selectAllContainer = document.getElementById('selectAllContainer');
             if (selectAllContainer) {
-                if (selectedGroup === '' && lotteryMode === 'batch') {
+                if (lotteryMode === 'class') {
                     selectAllContainer.style.display = 'block';
                 } else {
                     selectAllContainer.style.display = 'none';
@@ -5434,7 +5636,7 @@
             }
             
             // 按分组过滤
-            if (selectedGroup && selectedGroup !== 'individual') {
+            if (selectedGroup) {
                 filteredStudents = filteredStudents.filter(s => s.group === parseInt(selectedGroup));
             }
             
@@ -5458,8 +5660,8 @@
                 return;
             }
             
-            // 判断是否显示复选框（仅在"批量抽奖"模式下且"全体学生"时显示）
-            const showCheckbox = selectedGroup === '' && lotteryMode === 'batch';
+            // 判断是否显示复选框（仅在全班抽奖模式下显示，小组抽奖不显示）
+            const showCheckbox = (lotteryMode === 'class');
             
             filteredStudents.forEach(student => {
                 // 查找该学生在当前活动中的抽奖记录
@@ -5476,7 +5678,7 @@
                 // 构建HTML内容
                 let itemHTML = '';
                 
-                // 如果是"批量抽奖"模式且"全体学生"，添加复选框
+                // 如果是小组抽奖或全班抽奖模式，添加复选框
                 if (showCheckbox) {
                     const isChecked = selectedStudents.some(s => s.id === student.id);
                     itemHTML += `
@@ -5499,8 +5701,8 @@
                 item.innerHTML = itemHTML;
                 
                 // 点击事件
-                // 批量抽奖模式下有复选框：点击切换复选框状态
-                // 单人抽奖模式下无复选框：点击直接选中学生
+                // 全班抽奖模式下有复选框：点击切换复选框状态
+                // 单人抽奖或小组抽奖模式下无复选框：点击直接选中学生（仅单人抽奖模式有效）
                 if (!showCheckbox) {
                     item.onclick = () => selectStudent(student);
                 } else {
@@ -5549,9 +5751,9 @@
             const batchLotteryBtn = document.getElementById('batchLotteryBtn');
             const lotteryMode = currentLottery.mode || 'individual'; // 获取当前活动的抽奖模式
             
-            // 批量抽奖模式：始终显示批量抽奖按钮（除非选择"个人抽奖"）
+            // 小组抽奖或全班抽奖模式：始终显示批量抽奖按钮（除非选择"个人抽奖"）
             // 单人抽奖模式：始终隐藏批量抽奖按钮
-            if (lotteryMode === 'batch') {
+            if (lotteryMode === 'group' || lotteryMode === 'class') {
                 // 当选择"个人抽奖"时隐藏批量抽奖按钮
                 if (selectedGroup === 'individual') {
                     if (batchLotteryBtn) {
@@ -5582,7 +5784,7 @@
 
         // 选择学生
         function selectStudent(student) {
-            if (lotteryMode !== 'exclusive') return;
+            if (window.lotteryMode !== 'exclusive') return;
             
             selectedStudent = student;
             renderStudentList();
@@ -5679,15 +5881,15 @@
         // 记录抽奖结果
         function recordLotteryResult(prize, student = null) {
             // 如果没有传入student参数，使用selectedStudent
-            const targetStudent = student || (lotteryMode === 'exclusive' && selectedStudent ? selectedStudent : null);
+            const targetStudent = student || (window.lotteryMode === 'exclusive' && selectedStudent ? selectedStudent : null);
             
             // 判断当前记录的模式
-            // 如果传入了student参数，说明是批量抽奖或专属抽奖
-            // 批量抽奖模式下，currentLottery.mode === 'batch'
-            let recordMode = lotteryMode;
-            if (student && currentLottery && currentLottery.mode === 'batch') {
-                // 批量抽奖模式下，记录为'batch'
-                recordMode = 'batch';
+            // 使用currentLottery.mode来确定是单人抽奖、小组抽奖还是全班抽奖
+            let recordMode = window.lotteryMode; // 默认使用幸运/专属模式
+            
+            // 如果当前活动有mode设置（单人/小组/全班），使用活动的mode
+            if (currentLottery && currentLottery.mode) {
+                recordMode = currentLottery.mode;
             }
             
             const record = {
@@ -5712,7 +5914,7 @@
             lotteryRecords.unshift(record);
             
             // 如果是专属抽奖且没有传入student参数（单次抽奖），更新学生列表并清除选中状态
-            if (lotteryMode === 'exclusive' && !student) {
+            if (window.lotteryMode === 'exclusive' && !student) {
                 renderStudentList();
                 selectedStudent = null; // 抽奖后清除选中状态
             }
@@ -5731,23 +5933,47 @@
 
         // 批量抽奖
         function startBatchLottery() {
-            // 批量抽奖模式下，用户直接勾选学生进行抽奖，无需检查lotteryMode
-            // 获取当前选中的学生（通过复选框）
-            const checkboxes = document.querySelectorAll('.student-checkbox:checked');
+            const lotteryMode = currentLottery.mode || 'individual';
+            let selectedStudentsForBatch = [];
             
-            if (checkboxes.length === 0) {
-                showToast('请先勾选要抽奖的学生', 'warning');
-                return;
+            // 小组抽奖模式：直接获取当前分组的所有学生
+            if (lotteryMode === 'group') {
+                const selectedGroup = document.getElementById('groupSelector')?.value || '';
+                const selectedClass = document.getElementById('classSelector')?.value || '';
+                const searchKeyword = document.getElementById('studentSearchInput')?.value.toLowerCase().trim() || '';
+                
+                // 筛选当前分组的学生
+                let filteredStudents = students.filter(s => {
+                    if (selectedClass && s.class !== selectedClass) return false;
+                    if (selectedGroup && s.group != selectedGroup) return false;
+                    if (searchKeyword && !s.name.toLowerCase().includes(searchKeyword)) return false;
+                    return true;
+                });
+                
+                selectedStudentsForBatch = filteredStudents;
+                
+                if (selectedStudentsForBatch.length === 0) {
+                    showToast('当前小组没有学生', 'warning');
+                    return;
+                }
+            } else {
+                // 全班抽奖模式：通过复选框获取选中的学生
+                const checkboxes = document.querySelectorAll('.student-checkbox:checked');
+                
+                if (checkboxes.length === 0) {
+                    showToast('请先勾选要抽奖的学生', 'warning');
+                    return;
+                }
+
+                // 获取选中的学生ID列表
+                const selectedStudentIds = Array.from(checkboxes).map(cb => parseInt(cb.dataset.studentId));
+                
+                // 获取选中的学生对象
+                selectedStudentsForBatch = students.filter(s => selectedStudentIds.includes(s.id));
             }
 
-            // 获取选中的学生ID列表
-            const selectedStudentIds = Array.from(checkboxes).map(cb => parseInt(cb.dataset.studentId));
-            
-            // 获取选中的学生对象
-            const selectedStudents = students.filter(s => selectedStudentIds.includes(s.id));
-
             // 过滤掉已经抽过奖的学生
-            const availableStudents = selectedStudents.filter(student => {
+            const availableStudents = selectedStudentsForBatch.filter(student => {
                 return !lotteryRecords.some(r => 
                     r.studentId === student.id && r.lotteryId === currentLottery.id
                 );
@@ -5772,6 +5998,14 @@
             if (remainingPrizes.length === 0) {
                 showToast('奖品已全部抽完！', 'warning');
                 return;
+            }
+
+            // 检查奖品是否充足，如果不足则弹出确认对话框
+            if (remainingPrizes.length < availableStudents.length) {
+                const confirmResult = confirm(`奖品不足，继续抽奖只会为部分学生分配奖品，你确定继续吗？\n\n当前剩余奖品：${remainingPrizes.length}个\n待抽奖学生：${availableStudents.length}人`);
+                if (!confirmResult) {
+                    return; // 用户取消，不继续抽奖
+                }
             }
 
             // 准备批量抽奖数据
@@ -6014,10 +6248,10 @@
 
         // 显示当前活动的所有抽奖结果
         function showCurrentLotteryResults() {
-            // 筛选当前活动的专属抽奖和批量抽奖记录（有学生信息的记录）
+            // 筛选当前活动的所有有学生信息的抽奖记录（单人抽奖、小组抽奖、全班抽奖）
             const currentRecords = lotteryRecords.filter(r => 
                 r.lotteryId === currentLottery.id && 
-                (r.mode === 'exclusive' || r.mode === 'batch') && 
+                (r.mode === 'individual' || r.mode === 'group' || r.mode === 'class' || r.mode === 'exclusive' || r.mode === 'batch') && 
                 r.studentId
             );
 
@@ -6223,8 +6457,8 @@
             // 开始擦除
             function startScratch(e) {
                 // 专属抽奖模式检查 - 在开始刮奖前检查
-                if (lotteryMode === 'exclusive' && !selectedStudent) {
-                    showToast('请先选择学生后再抽奖', 'warning');
+                if (window.lotteryMode === 'exclusive' && !selectedStudent) {
+                    showToast('请先选择学生后再进行抽奖', 'warning');
                     return;
                 }
                 
@@ -6281,6 +6515,14 @@
                 canvas.addEventListener('touchmove', moveScratch, { passive: false });
                 canvas.addEventListener('touchend', endScratch);
                 canvas.addEventListener('touchcancel', endScratch);
+            } else {
+                // 批量抽奖模式下，点击刮刮卡区域提示用户使用批量抽奖按钮
+                const showBatchModeHint = (e) => {
+                    e.preventDefault();
+                    showToast('请点击"批量抽奖"按键进行批量抽奖', 'info');
+                };
+                canvas.addEventListener('mousedown', showBatchModeHint);
+                canvas.addEventListener('touchstart', showBatchModeHint, { passive: false });
             }
         }
 
@@ -6709,7 +6951,7 @@
             // 重置为创建模式
             editingLotteryId = null;
             selectedLotteryType = '开心刮刮乐';
-            selectedLotteryMode = 'individual'; // 默认为单人抽奖
+            selectedLotteryMode = 'verbal'; // 默认为口头指定抽奖
             prizeList = [
                 { name: '奖励书一本', count: 1 },
                 { name: '奖励铅笔一支', count: 1 },
@@ -6722,12 +6964,33 @@
             document.getElementById('submitBtn').textContent = '生成抽奖活动';
             
             // 重置抽奖模式单选按钮
-            const radioIndividual = document.querySelector('input[name="lotteryMode"][value="individual"]');
-            if (radioIndividual) radioIndividual.checked = true;
-            selectedLotteryMode = 'individual';
+            const radioVerbal = document.querySelector('input[name="lotteryMode"][value="verbal"]');
+            if (radioVerbal) radioVerbal.checked = true;
+            selectedLotteryMode = 'verbal';
+            
+            // 重置提示文案
+            const hintElement = document.getElementById('lotteryModeHint');
+            if (hintElement) {
+                hintElement.textContent = '💡 口头指定学生进行抽奖';
+            }
+            
+            // 移除抽奖模式的required标记
+            const modeLabel = document.getElementById('lotteryModeLabel');
+            if (modeLabel) {
+                modeLabel.className = 'form-label';
+            }
             
             // 隐藏提示信息
             document.getElementById('typeEditHint').style.display = 'none';
+            document.getElementById('modeEditHint').style.display = 'none';
+            
+            // 启用抽奖模式选择
+            const modeRadios = document.getElementById('lotteryModeRadios');
+            if (modeRadios) {
+                modeRadios.querySelectorAll('input[type="radio"]').forEach(radio => {
+                    radio.disabled = false;
+                });
+            }
             
             // 重置类型选择（恢复可点击状态）
             document.querySelectorAll('.type-card').forEach(card => {
@@ -6747,10 +7010,22 @@
             document.getElementById('createModal').classList.add('active');
         }
 
-        // 切换抽奖模式
         // 选择抽奖模式（单选按钮）
         function selectLotteryModeRadio(mode) {
             selectedLotteryMode = mode;
+            
+            // 更新提示文案
+            const hintText = {
+                'verbal': '💡 口头指定学生进行抽奖',
+                'individual': '💡 必须先选中指定学生后才能进行抽奖',
+                'group': '💡 先选中小组学生再进行批量抽奖',
+                'class': '💡 先选中全班学生再进行批量抽奖'
+            };
+            
+            const hintElement = document.getElementById('lotteryModeHint');
+            if (hintElement && hintText[mode]) {
+                hintElement.textContent = hintText[mode];
+            }
         }
 
         // 关闭创建弹窗
@@ -6815,6 +7090,26 @@
                 return;
             }
 
+            // 对九宫格类型的活动进行特殊处理：自动补齐"谢谢参与"
+            let finalPrizeList = [...prizeList];
+            if (selectedLotteryType === '九宫格') {
+                // 计算当前奖品类型数量（去重）
+                const prizeTypes = new Set();
+                finalPrizeList.forEach(prize => {
+                    const prizeName = typeof prize === 'string' ? prize : prize.name;
+                    prizeTypes.add(prizeName);
+                });
+                
+                // 如果奖品类型不足9个，自动添加"谢谢参与"补齐
+                const currentTypeCount = prizeTypes.size;
+                if (currentTypeCount < 9) {
+                    const thanksCount = 9 - currentTypeCount;
+                    for (let i = 0; i < thanksCount; i++) {
+                        finalPrizeList.push({ name: '谢谢参与', count: 1 });
+                    }
+                }
+            }
+
             if (editingLotteryId) {
                 // 编辑模式
                 const lottery = allLotteries.find(l => l.id === editingLotteryId);
@@ -6822,7 +7117,7 @@
                     lottery.title = title;
                     lottery.type = selectedLotteryType;
                     lottery.mode = selectedLotteryMode; // 保存抽奖模式
-                    lottery.prizes = [...prizeList];
+                    lottery.prizes = finalPrizeList;
                     
                     // 同步到当前显示列表
                     const displayLottery = lotteries.find(l => l.id === editingLotteryId);
@@ -6830,7 +7125,7 @@
                         displayLottery.title = title;
                         displayLottery.type = selectedLotteryType;
                         displayLottery.mode = selectedLotteryMode; // 保存抽奖模式
-                        displayLottery.prizes = [...prizeList];
+                        displayLottery.prizes = finalPrizeList;
                     }
                     
                     showToastTop('✅ 抽奖活动已更新', 'success');
@@ -6847,7 +7142,7 @@
                     type: selectedLotteryType,
                     mode: selectedLotteryMode, // 保存抽奖模式
                     createTime: new Date().toISOString().split('T')[1].split(':'),
-                    prizes: [...prizeList]
+                    prizes: finalPrizeList
                 };
 
                 allLotteries.unshift(newLottery);
@@ -7242,7 +7537,7 @@
                     <p><strong>功能描述：</strong>展示所有已创建的抽奖活动，支持筛选、搜索、创建、编辑、删除操作。</p>
                     <p><strong>功能逻辑：</strong></p>
                     <ul>
-                        <li>列表展示：以卡片形式展示抽奖活动，包含封面图（每种抽奖类型一个封面图）、标题（当标题超过卡片宽度时显示省略号）、类型标签（活动类型名称）、创建时间（年-月-日 时：分）、奖品数量（实际的奖品数量）</li>
+                        <li>列表展示：以卡片形式展示抽奖活动，包含封面图（每种抽奖类型一个封面图）、标题（当标题超过卡片宽度时显示省略号）、类型标签（活动类型名称）、抽奖模式标签（口头指定抽奖/单人抽奖/小组抽奖/全班抽奖，不同模式显示不同颜色）、创建时间（年-月-日 时：分）、奖品数量（实际的奖品数量）</li>
                         <li>筛选功能：支持按时间段（近一周/近一个月/近六个月/近一年/全部）和类型（开心刮刮乐/幸运转盘/九宫格）筛选，默认选中"全部"</li>
                         <li>搜索功能：支持按标题关键字搜索</li>
                         <li>分页功能：支持设置每页显示数量（10/20/30/40/50/100条），默认20条/页，支持上一页/下一页切换</li>
@@ -7261,7 +7556,20 @@
                     <p><strong>功能描述：</strong>通过弹窗形式创建或编辑抽奖活动，配置活动基本信息和奖品信息。</p>
                     <p><strong>功能逻辑：</strong></p>
                     <ul>
-                        <li>基本信息：抽奖标题（必填，不超过20个字）、抽奖类型（开心刮刮乐/幸运转盘/九宫格）、抽奖模式（单人抽奖/批量抽奖，通过单选按钮选择，默认为单人抽奖）</li>
+                        <li>基本信息：
+                            <ul>
+                                <li>抽奖标题：必填，不超过20个字</li>
+                                <li>抽奖类型：开心刮刮乐/幸运转盘/九宫格，通过卡片选择</li>
+                                <li>抽奖模式（必填）：口头指定抽奖/单人抽奖/小组抽奖/全班抽奖，通过单选按钮选择，默认为口头指定抽奖
+                                    <ul>
+                                        <li>口头指定抽奖：提示文案"口头指定学生进行抽奖"</li>
+                                        <li>单人抽奖：提示文案"先选中指定学生再进行抽奖"</li>
+                                        <li>小组抽奖：提示文案"选择小组后点击批量抽奖按钮为该小组进行抽奖"</li>
+                                        <li>全班抽奖：提示文案"先选中全班学生再进行批量抽奖"</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
                         <li>奖品配置：
                             <ul>
                                 <li>默认预制4种奖品：奖励书一本×1、奖励铅笔一支×1、奖励礼品一份×1、奖励奖状一个×1</li>
@@ -7275,6 +7583,7 @@
                     <p><strong>交互逻辑：</strong></p>
                     <ul>
                         <li>选择抽奖类型后，显示对应的类型卡片高亮效果，并更新奖品配置提示语</li>
+                        <li>选择抽奖模式后，右侧提示文案自动更新为对应模式的说明</li>
                         <li>点击"添加奖品"按钮，新增奖品输入框（开心刮刮乐和幸运转盘显示名称和数量两个输入框）</li>
                         <li>点击奖品右侧"✏️"按钮，编辑该奖品</li>
                         <li>点击奖品右侧"🗑️"按钮，删除该奖品</li>
@@ -7285,18 +7594,18 @@
 
                 <div id="section-2-4">
                         <h3>2.4 开心刮刮乐游戏（功能点 #4）</h3>
-                    <p><strong>功能描述：</strong>刮刮乐抽奖游戏，用户通过刮开卡片涂层查看中奖结果。支持幸运抽奖和专属抽奖两种模式。</p>
+                    <p><strong>功能描述：</strong>刮刮乐抽奖游戏，用户通过刮开卡片涂层查看中奖结果。根据创建时选择的抽奖模式（口头指定抽奖/单人抽奖/小组抽奖/全班抽奖）自动适配不同的交互方式。</p>
                     <p><strong>功能逻辑：</strong></p>
                     <ul>
                         <li>游戏界面：根据奖品总数量自适应显示刮刮卡（最多50张），刮刮卡在页面中居中显示，当数量较多时自动缩小卡片尺寸以确保全部显示在页面中，无需滚动条</li>
                         <li>奖品分配：根据每个奖品设置的数量生成对应数量的刮刮卡，随机打乱顺序显示</li>
                         <li>抽奖模式：
                             <ul>
-                                <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
-                                <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击或在刮奖区域按下提示“请先选择学生后再抽奖”，选中学生可以直接刮奖。</li>
+                                <li>口头指定抽奖：口头指定学生抽奖，抽奖结果无需绑定学生</li>
+                                <li>单人抽奖、小组抽奖、全班抽奖：当未选中学生时，点击或在刮奖区域按下提示“请先选择学生后再抽奖”，选中学生可以直接刮奖。</li>
                                 <li>学生名单显示在音乐按钮下方的左侧侧边栏，侧边栏顶部显示"学生名单"标题和班级下拉框（支持按班级筛选），下方显示搜索框（支持按学生姓名模糊查询），学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
-                                <li>学生选择方式：单人抽奖模式下，学生列表中无复选框，用户直接点击学生项选中该学生（高亮显示），再进行抽奖；批量抽奖模式下，在"全体学生"分组下，学生列表上方显示全选复选框，每个学生前显示单独的复选框，用户可勾选多个学生进行批量抽奖。</li>
-                                <li>批量抽奖：在学生列表下方提供"批量抽奖"按钮，仅在批量抽奖模式下可用。批量抽奖模式下，刮刮卡不能用鼠标/手指手动刮开，学生列表上方显示全选复选框，每个学生前显示单独的复选框，默认全部勾选，用户可以取消勾选不需要抽奖的学生，点击"批量抽奖"按钮后只对勾选的学生进行抽奖。系统同时刮开和学生数量对等的刮刮卡（每个学生对应一张卡片），所有卡片同时执行刮开动画（从上到下清除画布），刮开完成后弹窗展示所有学生的中奖结果（以奖品为主体归纳显示，每个奖品显示获得该奖品的所有学生名单，如"优惠券：张三、李四、王五"），抽奖记录自动保存（mode='batch'），可通过"查看抽奖结果"按钮查看本次批量抽奖的累计结果。当未勾选学生时，点击"批量抽奖"提示"请先勾选要抽奖的学生"；当勾选的学生都已抽过奖时，提示"选中的学生都已经抽过奖了"；当所有奖品都被抽完时，提示"奖品已全部抽完！"。</li>
+                                <li>学生选择方式：单人抽奖模式下，学生列表中无复选框，用户直接点击学生项选中该学生（选中后学生项背景变为浅蓝色#e8f0fe，边框变为蓝色#2B5FED进行高亮显示），必须选中学生后才能进行抽奖；小组抽奖模式下，显示分组选择器，学生列表中无复选框，点击"批量抽奖"按钮直接对当前选中小组的所有学生进行批量抽奖；全班抽奖模式下，学生列表上方显示全选复选框，每个学生前显示单独的复选框，用户可勾选多个学生进行批量抽奖。</li>
+                                <li>小组抽奖、全班抽奖：在学生列表下方提供"批量抽奖"按钮，仅在小组抽奖和全班抽奖模式下可用。小组抽奖模式下，刮刮卡不能用鼠标/手指手动刮开（点击刮刮卡区域提示"请点击'批量抽奖'按键进行批量抽奖"），点击"批量抽奖"按钮后自动对当前选中小组的所有学生进行抽奖（当前小组没有学生时提示"当前小组没有学生"）；全班抽奖模式下，刮刮卡不能用鼠标/手指手动刮开（点击刮刮卡区域提示"请点击'批量抽奖'按键进行批量抽奖"），学生列表上方显示全选复选框，每个学生前显示单独的复选框，默认全部勾选，用户可以取消勾选不需要抽奖的学生，点击"批量抽奖"按钮后只对勾选的学生进行抽奖。当奖品数量少于待抽奖学生数量时，弹出确认对话框"奖品不足，继续抽奖只会为部分学生分配奖品，你确定继续吗？"，提供"继续"、"取消"按钮。系统同时刮开和学生数量对等的刮刮卡（每个学生对应一张卡片），所有卡片同时执行刮开动画（从上到下清除画布），刮开完成后弹窗展示所有学生的中奖结果（以奖品为主体归纳显示，每个奖品显示获得该奖品的所有学生名单，如"优惠券：张三、李四、王五"），抽奖记录自动保存（mode='batch'），可通过"查看抽奖结果"按钮查看本次批量抽奖的累计结果。全班抽奖模式下，当未勾选学生时，点击"批量抽奖"提示"请先勾选要抽奖的学生"；当勾选的学生都已抽过奖时，提示"选中的学生都已经抽过奖了"；当所有奖品都被抽完时，提示"奖品已全部抽完！"。</li>
                             </ul>
                         </li>
                         <li>刮奖机制：
@@ -7308,12 +7617,10 @@
                             </ul>
                         </li>
                         <li>音乐控制：左上角音乐开关按钮，控制背景音乐播放</li>
-                        <li>抽奖记录：在背景音乐开关的右侧提供该活动历史"抽奖记录"按钮，点击后以网格卡片形式展示当前活动所有已抽奖学生的中奖结果（自适应布局，一屏显示）</li>
+                        <li>抽奖记录：在背景音乐开关的右侧提供该活动历史"抽奖记录"按钮，点击后以网格卡片形式展示当前活动所有已抽奖学生的中奖结果（自适应布局，一屏显示）。单人抽奖、小组抽奖、全班抽奖的记录都会自动保存，学生所抽奖品会实时记录在学生名单中，点击"查看抽奖结果"按钮可查看本次活动所有学生的抽奖结果。</li>
                     </ul>
                     <p><strong>交互逻辑：</strong></p>
                     <ul>
-                        <li>选择抽奖模式：点击"幸运抽奖"或"专属抽奖"切换模式</li>
-                        <li>专属抽奖模式：左侧显示学生名单（位于音乐按钮下方），点击选中学生后才能抽奖</li>
                         <li>鼠标/手指按下并移动：刮开涂层</li>
                         <li>刮开达到阈值：自动显示奖品并弹出提示，记录抽奖结果</li>
                         <li>点击弹窗"确定"按钮或弹窗外部区域：立即关闭弹窗</li>
@@ -7340,11 +7647,11 @@
                         </li>
                         <li>抽奖模式：
                             <ul>
-                                <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
-                                <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击抽奖提示“请先选择学生后再抽奖”，选中学生可以直接点击抽奖。</li>
+                                <li>口头指定抽奖：口头指定学生抽奖，抽奖结果无需绑定学生</li>
+                                <li>单人抽奖、小组抽奖、全班抽奖：当未选中学生时，点击抽奖提示“请先选择学生后再抽奖”，选中学生可以直接点击抽奖。</li>
                                 <li>学生名单显示在音乐按钮下方的左侧侧边栏，侧边栏顶部显示"学生名单"标题和班级下拉框（支持按班级筛选），下方显示搜索框（支持按学生姓名模糊查询），学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
-                                <li>学生选择方式：单人抽奖模式下，学生列表中无复选框，用户直接点击学生项选中该学生（高亮显示），再进行抽奖；批量抽奖模式下，在"全体学生"分组下，学生列表上方显示全选复选框，每个学生前显示单独的复选框，用户可勾选多个学生进行批量抽奖。</li>
-                                <li>批量抽奖：在学生列表下方提供"批量抽奖"按钮，仅在批量抽奖模式下可用。批量抽奖模式下，转盘中心按钮去掉"抽奖"文案且不能点击，学生列表上方显示全选复选框，每个学生前显示单独的复选框，默认全部勾选，用户可以取消勾选不需要抽奖的学生，点击"批量抽奖"按钮后只对勾选的学生进行抽奖。转盘旋转3秒（旋转3圈，先快后慢），旋转完成后弹窗展示所有学生的中奖结果（以奖品为主体归纳显示，每个奖品显示获得该奖品的所有学生名单，如"优惠券：张三、李四、王五"），抽奖记录自动保存（mode='batch'），可通过"查看抽奖结果"按钮查看本次批量抽奖的累计结果。当未勾选学生时，点击"批量抽奖"提示"请先勾选要抽奖的学生"；当勾选的学生都已抽过奖时，提示"选中的学生都已经抽过奖了"；当所有奖品都被抽完时，提示"奖品已全部抽完！"。</li>
+                                <li>学生选择方式：单人抽奖模式下，学生列表中无复选框，用户直接点击学生项选中该学生（选中后学生项背景变为浅蓝色#e8f0fe，边框变为蓝色#2B5FED进行高亮显示），必须选中学生后才能进行抽奖；小组抽奖模式下，显示分组选择器，学生列表中无复选框，点击"批量抽奖"按钮直接对当前选中小组的所有学生进行批量抽奖；全班抽奖模式下，学生列表上方显示全选复选框，每个学生前显示单独的复选框，用户可勾选多个学生进行批量抽奖。</li>
+                                <li>小组抽奖、全班抽奖：在学生列表下方提供"批量抽奖"按钮，仅在小组抽奖和全班抽奖模式下可用。小组抽奖模式下，转盘中心按钮去掉"抽奖"文案且不能点击（点击转盘中心按钮提示"请点击'批量抽奖'按键进行批量抽奖"），点击"批量抽奖"按钮后自动对当前选中小组的所有学生进行抽奖（当前小组没有学生时提示"当前小组没有学生"）；全班抽奖模式下，转盘中心按钮去掉"抽奖"文案且不能点击（点击转盘中心按钮提示"请点击'批量抽奖'按键进行批量抽奖"），学生列表上方显示全选复选框，每个学生前显示单独的复选框，默认全部勾选，用户可以取消勾选不需要抽奖的学生，点击"批量抽奖"按钮后只对勾选的学生进行抽奖。当奖品数量少于待抽奖学生数量时，弹出确认对话框"奖品不足，继续抽奖只会为部分学生分配奖品，你确定继续吗？"，提供"继续"、"取消"按钮。转盘旋转3秒（旋转3圈，先快后慢），旋转完成后弹窗展示所有学生的中奖结果（以奖品为主体归纳显示，每个奖品显示获得该奖品的所有学生名单，如"优惠券：张三、李四、王五"），抽奖记录自动保存（mode='batch'），可通过"查看抽奖结果"按钮查看本次批量抽奖的累计结果。全班抽奖模式下，当未勾选学生时，点击"批量抽奖"提示"请先勾选要抽奖的学生"；当勾选的学生都已抽过奖时，提示"选中的学生都已经抽过奖了"；当所有奖品都被抽完时，提示"奖品已全部抽完！"。</li>
                             </ul>
                         </li>
                         <li>转动机制：
@@ -7359,12 +7666,10 @@
                         </li>
                         <li>防重复点击：转动过程中禁用抽奖按钮</li>
                         <li>音乐控制：左上角音乐开关按钮，控制背景音乐播放</li>
-                        <li>抽奖记录：在背景音乐开关的右侧提供该活动历史"抽奖记录"按钮，点击后以网格卡片形式展示当前活动所有已抽奖学生的中奖结果（自适应布局，一屏显示）</li>
+                        <li>抽奖记录：在背景音乐开关的右侧提供该活动历史"抽奖记录"按钮，点击后以网格卡片形式展示当前活动所有已抽奖学生的中奖结果（自适应布局，一屏显示）。单人抽奖、小组抽奖、全班抽奖的记录都会自动保存，学生所抽奖品会实时记录在学生名单中，点击"查看抽奖结果"按钮可查看本次活动所有学生的抽奖结果。</li>
                     </ul>
                     <p><strong>交互逻辑：</strong></p>
-                    <ul>
-                        <li>选择抽奖模式：点击"幸运抽奖"或"专属抽奖"切换模式</li>
-                        <li>专属抽奖模式：左侧显示学生名单（位于音乐按钮下方），点击选中学生后才能抽奖</li>
+                    <ul>                    
                         <li>点击"抽奖"按钮：开始转动转盘</li>
                         <li>转动过程：按钮文字变为"抽奖中..."，禁用点击</li>
                         <li>转动结束：弹窗显示中奖结果，记录抽奖结果，3秒倒计时后自动关闭</li>
@@ -7380,8 +7685,8 @@
                     <p><strong>功能描述：</strong>九宫格跑马灯抽奖游戏，格子依次高亮，停止位置为中奖结果。支持幸运抽奖和专属抽奖两种模式。</p>
                     <p><strong>功能逻辑：</strong></p>
                     <ul>
-                        <li>游戏界面：3×3网格布局，中心为"开始抽奖"按钮，周围8个格子显示奖品</li>
-                        <li>奖品展示：每个格子显示奖品图标和名称，只显示当前还有剩余数量的奖品种类，不足9种的格子显示"谢谢参与"</li>
+                        <li>游戏界面：3×3网格布局，底部为"开始抽奖"按钮，9个格子显示奖品</li>
+                        <li>奖品展示：每个格子显示奖品图标和名称，只显示当前还有剩余数量的奖品种类，不足9种的格子显示"谢谢参与"，每个谢谢参与为1个奖品类型、数量为1个</li>
                         <li>奖品池机制：
                             <ul>
                                 <li>最多添加9种奖品类型，奖品总数最多50个</li>
@@ -7393,16 +7698,16 @@
                         </li>
                         <li>抽奖模式：
                             <ul>
-                                <li>幸运抽奖（默认）：口头指定学生抽奖，抽奖结果无需绑定学生</li>
-                                <li>专属抽奖：先选中指定学生抽奖，抽奖结果绑定学生并记录。当未选中学生时，点击开始抽奖提示“请先选择学生后再抽奖”，选中学生可以直接点击开始抽奖。</li>
+                                <li>口头指定抽奖：口头指定学生抽奖，抽奖结果无需绑定学生</li>
+                                <li>单人抽奖、小组抽奖、全班抽奖：当未选中学生时，点击开始抽奖提示“请先选择学生后再抽奖”，选中学生可以直接点击开始抽奖。</li>
                                 <li>学生名单显示在音乐按钮下方的左侧侧边栏，侧边栏顶部显示"学生名单"标题和班级下拉框（支持按班级筛选），下方显示搜索框（支持按学生姓名模糊查询），学生头像和姓名要和学生管理的一致，刷新或者下次进入，无需显示学生之前所抽中的奖品，仅记录单次抽中的奖品。</li>
-                                <li>学生选择方式：单人抽奖模式下，学生列表中无复选框，用户直接点击学生项选中该学生（高亮显示），再进行抽奖；批量抽奖模式下，在"全体学生"分组下，学生列表上方显示全选复选框，每个学生前显示单独的复选框，用户可勾选多个学生进行批量抽奖。</li>
-                                <li>批量抽奖：在学生列表下方提供"批量抽奖"按钮，仅在批量抽奖模式下可用。批量抽奖模式下，九宫格中心隐藏"开始抽奖"按钮，学生列表上方显示全选复选框，每个学生前显示单独的复选框，默认全部勾选，用户可以取消勾选不需要抽奖的学生，点击"批量抽奖"按钮后只对勾选的学生进行抽奖。九宫格跑马灯3秒（格子按顺时针方向依次高亮，每格40ms），跑马灯完成后弹窗展示所有学生的中奖结果（以奖品为主体归纳显示，每个奖品显示获得该奖品的所有学生名单，如"优惠券：张三、李四、王五"），抽奖记录自动保存（mode='batch'），可通过"查看抽奖结果"按钮查看本次批量抽奖的累计结果。当未勾选学生时，点击"批量抽奖"提示"请先勾选要抽奖的学生"；当勾选的学生都已抽过奖时，提示"选中的学生都已经抽过奖了"；当所有奖品都被抽完时，提示"奖品已全部抽完！"。</li>
+                                <li>学生选择方式：单人抽奖模式下，学生列表中无复选框，用户直接点击学生项选中该学生（选中后学生项背景变为浅蓝色#e8f0fe，边框变为蓝色#2B5FED进行高亮显示），必须选中学生后才能进行抽奖；小组抽奖模式下，显示分组选择器，学生列表中无复选框，点击"批量抽奖"按钮直接对当前选中小组的所有学生进行批量抽奖；全班抽奖模式下，学生列表上方显示全选复选框，每个学生前显示单独的复选框，用户可勾选多个学生进行批量抽奖。</li>
+                                <li>小组抽奖、全班抽奖：在学生列表下方提供"批量抽奖"按钮，仅在小组抽奖和全班抽奖模式下可用。小组抽奖模式下，九宫格中心隐藏"开始抽奖"按钮（点击九宫格区域提示"请点击'批量抽奖'按键进行批量抽奖"），点击"批量抽奖"按钮后自动对当前选中小组的所有学生进行抽奖（当前小组没有学生时提示"当前小组没有学生"）；全班抽奖模式下，九宫格中心隐藏"开始抽奖"按钮（点击九宫格区域提示"请点击'批量抽奖'按键进行批量抽奖"），学生列表上方显示全选复选框，每个学生前显示单独的复选框，默认全部勾选，用户可以取消勾选不需要抽奖的学生，点击"批量抽奖"按钮后只对勾选的学生进行抽奖。当奖品数量少于待抽奖学生数量时，弹出确认对话框"奖品不足，继续抽奖只会为部分学生分配奖品，你确定继续吗？"，提供"继续"、"取消"按钮。九宫格跑马灯3秒（格子按顺时针方向依次高亮，每格40ms），跑马灯完成后弹窗展示所有学生的中奖结果（以奖品为主体归纳显示，每个奖品显示获得该奖品的所有学生名单，如"优惠券：张三、李四、王五"），抽奖记录自动保存（mode='batch'），可通过"查看抽奖结果"按钮查看本次批量抽奖的累计结果。全班抽奖模式下，当未勾选学生时，点击"批量抽奖"提示"请先勾选要抽奖的学生"；当勾选的学生都已抽过奖时，提示"选中的学生都已经抽过奖了"；当所有奖品都被抽完时，提示"奖品已全部抽完！"。</li>
                             </ul>
                         </li>
                         <li>跑马灯机制：
                             <ul>
-                                <li>点击"开始抽奖"按钮，格子按顺时针方向依次高亮</li>
+                                <li>口头指定抽奖和单人抽奖模式下，九宫格下方显示"开始抽奖"按钮，点击按钮后格子按顺时针方向依次高亮</li>
                                 <li>初始速度较快，逐渐减速</li>
                                 <li>停止在随机选中的奖品格子上</li>
                                 <li>弹窗显示中奖结果：抽中奖品显示"恭喜中奖"和奖品名称，抽中"谢谢参与"显示"很遗憾，未抽中奖品"</li>
@@ -7412,12 +7717,10 @@
                         </li>
                         <li>防重复点击：抽奖过程中禁用开始按钮</li>
                         <li>音乐控制：左上角音乐开关按钮，控制背景音乐播放</li>
-                        <li>抽奖记录：在背景音乐开关的右侧提供该活动历史"抽奖记录"按钮，点击后以网格卡片形式展示当前活动所有已抽奖学生的中奖结果（自适应布局，一屏显示）</li>
+                        <li>抽奖记录：在背景音乐开关的右侧提供该活动历史"抽奖记录"按钮，点击后以网格卡片形式展示当前活动所有已抽奖学生的中奖结果（自适应布局，一屏显示）。单人抽奖、小组抽奖、全班抽奖的记录都会自动保存，学生所抽奖品会实时记录在学生名单中，点击"查看抽奖结果"按钮可查看本次活动所有学生的抽奖结果。</li>
                     </ul>
                     <p><strong>交互逻辑：</strong></p>
-                    <ul>
-                        <li>选择抽奖模式：点击"幸运抽奖"或"专属抽奖"切换模式</li>
-                        <li>专属抽奖模式：左侧显示学生名单（位于音乐按钮下方），点击选中学生后才能抽奖</li>
+                    <ul>                                             
                         <li>点击"开始抽奖"按钮：启动跑马灯抽奖</li>
                         <li>抽奖过程：格子依次高亮，按钮禁用</li>
                         <li>抽奖结束：中奖格子保持高亮，弹窗显示中奖结果，记录抽奖结果，九宫格自动更新，3秒倒计时后自动关闭</li>
